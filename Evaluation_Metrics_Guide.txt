@@ -1,0 +1,1743 @@
+================================================================================
+   COMPLETE EVALUATION METRICS GUIDE
+   For Machine Learning & Deep Learning Projects
+================================================================================
+
+This guide covers EVERY evaluation metric you will encounter across
+all 7 ML projects and 13 DL projects in your roadmap. Organized by
+task type with formulas, intuition, when to use, and Python code.
+
+================================================================================
+TABLE OF CONTENTS
+================================================================================
+
+  SECTION 1: CLASSIFICATION METRICS
+    1.1  Accuracy
+    1.2  Confusion Matrix (TP, TN, FP, FN)
+    1.3  Precision
+    1.4  Recall (Sensitivity / TPR)
+    1.5  F1-Score
+    1.6  ROC Curve & AUC-ROC
+    1.7  Precision-Recall Curve & AUPRC
+    1.8  Log Loss (Binary Cross-Entropy)
+    1.9  Top-K Accuracy
+    1.10 Cohen's Kappa
+    1.11 Matthews Correlation Coefficient (MCC)
+    1.12 Specificity (TNR)
+
+  SECTION 2: REGRESSION METRICS
+    2.1  Mean Absolute Error (MAE)
+    2.2  Mean Squared Error (MSE)
+    2.3  Root Mean Squared Error (RMSE)
+    2.4  R-Squared (R2)
+    2.5  Adjusted R-Squared
+    2.6  Mean Absolute Percentage Error (MAPE)
+    2.7  Root Mean Squared Log Error (RMSLE)
+
+  SECTION 3: OBJECT DETECTION METRICS
+    3.1  IoU (Intersection over Union)
+    3.2  mAP@0.5
+    3.3  mAP@0.5:0.95
+    3.4  Precision-Recall per Class
+    3.5  Inference FPS
+
+  SECTION 4: IMAGE SEGMENTATION METRICS
+    4.1  Dice Coefficient (F1 for Segmentation)
+    4.2  IoU / Jaccard Index
+    4.3  Pixel Accuracy
+    4.4  Hausdorff Distance
+
+  SECTION 5: NLP & SEQUENCE METRICS
+    5.1  BLEU Score
+    5.2  ROUGE Score (ROUGE-1, ROUGE-2, ROUGE-L)
+    5.3  BERTScore
+    5.4  Perplexity
+    5.5  Character Error Rate (CER)
+    5.6  Word Error Rate (WER)
+
+  SECTION 6: GENERATIVE MODEL METRICS (GAN / VAE)
+    6.1  FID (Frechet Inception Distance)
+    6.2  IS (Inception Score)
+    6.3  LPIPS (Learned Perceptual Image Patch Similarity)
+
+  SECTION 7: IMAGE QUALITY METRICS (Super-Resolution)
+    7.1  PSNR (Peak Signal-to-Noise Ratio)
+    7.2  SSIM (Structural Similarity Index)
+
+  SECTION 8: REINFORCEMENT LEARNING METRICS
+    8.1  Average Reward (Return)
+    8.2  Episode Length
+    8.3  Reward Curve & Training Stability
+    8.4  Success Rate
+
+  SECTION 9: WHICH METRIC FOR WHICH PROJECT?
+
+
+================================================================================
+SECTION 1: CLASSIFICATION METRICS
+================================================================================
+Used in: Titanic, Churn Prediction, Fraud Detection, Dog Breed
+         Classifier, Sentiment Analysis, Speech Emotion Recognition,
+         Deepfake Detection, Skin Cancer Classification
+
+------------------------------------------------------------------------
+1.1  ACCURACY
+------------------------------------------------------------------------
+
+  What it measures:
+    Percentage of total predictions that are correct.
+
+  Formula:
+    Accuracy = (TP + TN) / (TP + TN + FP + FN)
+
+  Intuition:
+    If you have 100 emails and correctly classify 90 as spam/not-spam,
+    your accuracy is 90%.
+
+  When to use:
+    - When classes are BALANCED (roughly equal number of each class)
+    - Quick first-look metric
+
+  When NOT to use:
+    - IMBALANCED datasets (e.g., fraud detection with 99.8% non-fraud)
+    - Example: A model that always predicts "not fraud" gets 99.8%
+      accuracy but catches ZERO frauds. Accuracy is MISLEADING here.
+
+  Python:
+    from sklearn.metrics import accuracy_score
+    accuracy = accuracy_score(y_true, y_pred)
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.2  CONFUSION MATRIX (TP, TN, FP, FN)
+------------------------------------------------------------------------
+
+  What it is:
+    A table that shows the full picture of predictions vs reality.
+
+                          Predicted
+                      Positive  Negative
+    Actual Positive |   TP    |   FN    |
+    Actual Negative |   FP    |   TN    |
+
+  Key Terms:
+    TP (True Positive)  = Correctly predicted positive
+                          (Model said "fraud", it WAS fraud)
+    TN (True Negative)  = Correctly predicted negative
+                          (Model said "not fraud", it was NOT fraud)
+    FP (False Positive)  = Incorrectly predicted positive (Type I Error)
+                          (Model said "fraud", but it was NOT fraud)
+                          Also called: "False Alarm"
+    FN (False Negative) = Incorrectly predicted negative (Type II Error)
+                          (Model said "not fraud", but it WAS fraud)
+                          Also called: "Missed Detection"
+
+  Why it matters:
+    The confusion matrix is the FOUNDATION. Every classification
+    metric (precision, recall, F1, etc.) is derived from these
+    four numbers. Always look at this first.
+
+  Python:
+    from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
+    import matplotlib.pyplot as plt
+
+    cm = confusion_matrix(y_true, y_pred)
+    disp = ConfusionMatrixDisplay(cm, display_labels=['Not Fraud','Fraud'])
+    disp.plot(cmap='Blues')
+    plt.show()
+
+
+------------------------------------------------------------------------
+1.3  PRECISION
+------------------------------------------------------------------------
+
+  What it measures:
+    Of all the items the model predicted as positive, how many
+    were ACTUALLY positive?
+
+  Formula:
+    Precision = TP / (TP + FP)
+
+  Intuition:
+    "When the model says YES, how often is it RIGHT?"
+
+    Spam filter example: Of 100 emails flagged as spam, 90 were
+    actually spam -> Precision = 90%.
+
+  When to prioritize Precision:
+    - When FALSE POSITIVES are COSTLY
+    - Spam filter: You don't want legitimate emails marked as spam
+    - Medical testing: Don't want healthy people told they have cancer
+    - Content recommendation: Don't want irrelevant content shown
+
+  Python:
+    from sklearn.metrics import precision_score
+    precision = precision_score(y_true, y_pred)
+    # For multi-class:
+    precision = precision_score(y_true, y_pred, average='weighted')
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.4  RECALL (Sensitivity / True Positive Rate)
+------------------------------------------------------------------------
+
+  What it measures:
+    Of all the ACTUAL positive items, how many did the model
+    correctly identify?
+
+  Formula:
+    Recall = TP / (TP + FN)
+
+  Intuition:
+    "Of all the actual positives, how many did the model CATCH?"
+
+    Fraud detection example: Of 100 actual fraud cases, the model
+    caught 80 -> Recall = 80%.
+
+  When to prioritize Recall:
+    - When FALSE NEGATIVES are COSTLY
+    - Fraud detection: Missing a fraud is very expensive
+    - Disease diagnosis: Missing a cancer is life-threatening
+    - Security: Missing a threat is dangerous
+
+  The Precision-Recall Trade-off:
+    Increasing precision usually decreases recall and vice versa.
+    - Strict threshold (high confidence to predict positive):
+      HIGH precision, LOW recall
+    - Loose threshold (low confidence to predict positive):
+      LOW precision, HIGH recall
+
+  Python:
+    from sklearn.metrics import recall_score
+    recall = recall_score(y_true, y_pred)
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.5  F1-SCORE
+------------------------------------------------------------------------
+
+  What it measures:
+    The HARMONIC MEAN of precision and recall. Balances both metrics.
+
+  Formula:
+    F1 = 2 * (Precision * Recall) / (Precision + Recall)
+
+  Why harmonic mean (not arithmetic mean)?
+    Harmonic mean penalizes extreme imbalances more heavily.
+    If Precision = 1.0 and Recall = 0.0:
+      Arithmetic mean = 0.5 (misleadingly high)
+      Harmonic mean = 0.0 (correctly shows failure)
+
+  Variants for Multi-Class:
+    - Micro F1:    Calculate globally (total TP, FP, FN across all classes)
+    - Macro F1:    Average F1 of each class (treats all classes equally)
+    - Weighted F1: Average F1 weighted by class support (sample count)
+
+    Use Macro when: all classes equally important (even rare ones)
+    Use Weighted when: you want to account for class imbalance
+    Use Micro when: you care about overall performance
+
+  When to use:
+    - Imbalanced datasets (much better than accuracy)
+    - When you need a single number balancing precision and recall
+    - Customer churn, fraud detection, medical diagnosis
+
+  Python:
+    from sklearn.metrics import f1_score
+
+    # Binary
+    f1 = f1_score(y_true, y_pred)
+
+    # Multi-class
+    f1_macro = f1_score(y_true, y_pred, average='macro')
+    f1_weighted = f1_score(y_true, y_pred, average='weighted')
+    f1_per_class = f1_score(y_true, y_pred, average=None)
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.6  ROC CURVE & AUC-ROC
+------------------------------------------------------------------------
+
+  What it measures:
+    ROC (Receiver Operating Characteristic) curve plots the
+    True Positive Rate (Recall) vs False Positive Rate at
+    different classification thresholds.
+
+    AUC-ROC = Area Under the ROC Curve.
+
+  Axes:
+    X-axis: FPR = FP / (FP + TN)  (False Positive Rate)
+    Y-axis: TPR = TP / (TP + FN)  (True Positive Rate = Recall)
+
+  Intuition:
+    "How well does the model distinguish between classes
+    ACROSS ALL POSSIBLE THRESHOLDS?"
+
+    AUC = 1.0  -> Perfect classifier
+    AUC = 0.5  -> Random guessing (diagonal line)
+    AUC < 0.5  -> Worse than random (model is inverted)
+
+  When to use:
+    - Binary classification with probability outputs
+    - Comparing models regardless of threshold choice
+    - When classes are reasonably balanced
+
+  When NOT to use:
+    - HIGHLY imbalanced data (use AUPRC instead)
+    - ROC can be misleadingly optimistic when negatives dominate
+
+  Python:
+    from sklearn.metrics import roc_auc_score, roc_curve
+    import matplotlib.pyplot as plt
+
+    # AUC score (needs probability predictions)
+    auc = roc_auc_score(y_true, y_pred_proba)
+
+    # Plot ROC curve
+    fpr, tpr, thresholds = roc_curve(y_true, y_pred_proba)
+    plt.plot(fpr, tpr, label=f'AUC = {auc:.3f}')
+    plt.plot([0,1], [0,1], 'k--', label='Random')
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend()
+    plt.show()
+
+  Range: 0 to 1 (higher is better, 0.5 = random)
+
+
+------------------------------------------------------------------------
+1.7  PRECISION-RECALL CURVE & AUPRC
+------------------------------------------------------------------------
+
+  What it measures:
+    Plots Precision vs Recall at different thresholds.
+    AUPRC = Area Under the Precision-Recall Curve.
+
+  Intuition:
+    Unlike ROC which can be misleading on imbalanced data,
+    PR curves focus on the POSITIVE class performance.
+
+  Example - Why AUPRC matters for imbalanced data:
+    Credit card fraud: 99.8% legitimate, 0.2% fraud
+    A bad model could have AUC-ROC = 0.95 but AUPRC = 0.10
+    AUPRC reveals the model barely catches any fraud.
+
+  When to use:
+    - HIGHLY IMBALANCED datasets (fraud, rare disease, anomaly)
+    - When you care more about positive class performance
+    - Credit Card Fraud Detection project
+
+  Python:
+    from sklearn.metrics import (precision_recall_curve,
+                                  average_precision_score)
+    import matplotlib.pyplot as plt
+
+    auprc = average_precision_score(y_true, y_pred_proba)
+
+    precision, recall, thresholds = precision_recall_curve(
+        y_true, y_pred_proba
+    )
+    plt.plot(recall, precision, label=f'AUPRC = {auprc:.3f}')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.title('Precision-Recall Curve')
+    plt.legend()
+    plt.show()
+
+  Range: 0 to 1 (higher is better)
+  Baseline: (number of positives) / (total samples)
+
+
+------------------------------------------------------------------------
+1.8  LOG LOSS (Binary Cross-Entropy)
+------------------------------------------------------------------------
+
+  What it measures:
+    Penalizes the model based on how CONFIDENT it is in wrong
+    predictions. A confident wrong prediction is penalized much
+    more than an uncertain wrong prediction.
+
+  Formula:
+    LogLoss = -(1/N) * SUM[ y*log(p) + (1-y)*log(1-p) ]
+
+    Where y = actual label (0 or 1), p = predicted probability
+
+  Intuition:
+    - Model predicts 0.99 for class 1, actual IS 1 -> low penalty
+    - Model predicts 0.99 for class 1, actual IS 0 -> HUGE penalty
+    - Model predicts 0.51 for class 1, actual IS 0 -> small penalty
+
+  When to use:
+    - When you care about CALIBRATED probabilities (not just
+      correct/incorrect)
+    - Kaggle competitions often use log loss
+    - Deepfake detection (confidence matters)
+
+  Python:
+    from sklearn.metrics import log_loss
+    loss = log_loss(y_true, y_pred_proba)
+
+  Range: 0 to infinity (LOWER is better)
+  Perfect score: 0
+
+
+------------------------------------------------------------------------
+1.9  TOP-K ACCURACY
+------------------------------------------------------------------------
+
+  What it measures:
+    Whether the correct class is among the model's top K
+    predictions.
+
+  Intuition:
+    Dog breed classifier with 120 breeds:
+    - Top-1 Accuracy: Is the #1 prediction correct? (70%)
+    - Top-5 Accuracy: Is the correct breed in the top 5? (95%)
+
+    Top-5 is useful when classes are visually similar (e.g.,
+    different terrier breeds).
+
+  When to use:
+    - Multi-class problems with MANY classes (dog breeds, flowers,
+      ImageNet)
+    - When "close enough" predictions still have value
+
+  Python:
+    import torch
+
+    # PyTorch
+    def top_k_accuracy(output, target, k=5):
+        _, pred = output.topk(k, dim=1)
+        correct = pred.eq(target.view(-1, 1).expand_as(pred))
+        return correct.any(dim=1).float().mean().item()
+
+    # Sklearn (v1.1+)
+    from sklearn.metrics import top_k_accuracy_score
+    top5 = top_k_accuracy_score(y_true, y_pred_proba, k=5)
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.10 COHEN'S KAPPA
+------------------------------------------------------------------------
+
+  What it measures:
+    Agreement between predictions and actual labels, accounting
+    for agreement that could happen BY CHANCE.
+
+  Formula:
+    Kappa = (Observed Accuracy - Expected Accuracy) /
+            (1 - Expected Accuracy)
+
+  Interpretation:
+    Kappa < 0    = Worse than random
+    Kappa = 0    = No better than random
+    0.0 - 0.20   = Slight agreement
+    0.21 - 0.40  = Fair agreement
+    0.41 - 0.60  = Moderate agreement
+    0.61 - 0.80  = Substantial agreement
+    0.81 - 1.00  = Almost perfect agreement
+
+  When to use:
+    - Multi-class classification with imbalanced classes
+    - When accuracy is misleading due to class distribution
+
+  Python:
+    from sklearn.metrics import cohen_kappa_score
+    kappa = cohen_kappa_score(y_true, y_pred)
+
+  Range: -1 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.11 MATTHEWS CORRELATION COEFFICIENT (MCC)
+------------------------------------------------------------------------
+
+  What it measures:
+    A balanced measure that uses all four confusion matrix values.
+    Considered the BEST single metric for binary classification,
+    especially on imbalanced data.
+
+  Formula:
+    MCC = (TP*TN - FP*FN) /
+          sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
+
+  Interpretation:
+    MCC = +1  -> Perfect prediction
+    MCC =  0  -> Random prediction
+    MCC = -1  -> Total disagreement
+
+  When to use:
+    - Imbalanced binary classification
+    - When you want one metric that accounts for all four
+      quadrants of the confusion matrix
+    - Often cited in biomedical research
+
+  Python:
+    from sklearn.metrics import matthews_corrcoef
+    mcc = matthews_corrcoef(y_true, y_pred)
+
+  Range: -1 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+1.12 SPECIFICITY (True Negative Rate)
+------------------------------------------------------------------------
+
+  What it measures:
+    Of all ACTUAL NEGATIVES, how many did the model correctly
+    identify as negative?
+
+  Formula:
+    Specificity = TN / (TN + FP)
+
+  Intuition:
+    "How good is the model at identifying NEGATIVES?"
+    Medical test: Of 1000 healthy people, how many were correctly
+    told they are healthy?
+
+  Relation to Recall:
+    Recall focuses on catching positives
+    Specificity focuses on correctly rejecting negatives
+
+  Python:
+    from sklearn.metrics import confusion_matrix
+
+    tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
+    specificity = tn / (tn + fp)
+
+  Range: 0 to 1 (higher is better)
+
+
+================================================================================
+SECTION 2: REGRESSION METRICS
+================================================================================
+Used in: House Price Prediction, Store Sales Forecasting,
+         Time Series projects, Super-Resolution (PSNR)
+
+------------------------------------------------------------------------
+2.1  MEAN ABSOLUTE ERROR (MAE)
+------------------------------------------------------------------------
+
+  What it measures:
+    Average of the absolute differences between predictions
+    and actual values.
+
+  Formula:
+    MAE = (1/N) * SUM( |y_actual - y_predicted| )
+
+  Intuition:
+    "On average, the prediction is off by $X."
+    MAE = $15,000 means on average the house price prediction
+    is $15,000 away from the true price.
+
+  Properties:
+    - Easy to interpret (same unit as target)
+    - Less sensitive to outliers than MSE/RMSE
+    - Treats all errors equally regardless of size
+
+  Python:
+    from sklearn.metrics import mean_absolute_error
+    mae = mean_absolute_error(y_true, y_pred)
+
+  Range: 0 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+2.2  MEAN SQUARED ERROR (MSE)
+------------------------------------------------------------------------
+
+  What it measures:
+    Average of the SQUARED differences between predictions
+    and actual values.
+
+  Formula:
+    MSE = (1/N) * SUM( (y_actual - y_predicted)^2 )
+
+  Intuition:
+    Squaring punishes LARGE ERRORS much more heavily than
+    small errors.
+    Error of 10 -> 100
+    Error of 100 -> 10,000  (100x worse, not 10x)
+
+  Properties:
+    - Very sensitive to outliers (large errors dominate)
+    - Unit is squared (hard to interpret directly)
+    - Commonly used as LOSS FUNCTION during training
+    - Differentiable everywhere (good for gradient descent)
+
+  Python:
+    from sklearn.metrics import mean_squared_error
+    mse = mean_squared_error(y_true, y_pred)
+
+  Range: 0 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+2.3  ROOT MEAN SQUARED ERROR (RMSE)
+------------------------------------------------------------------------
+
+  What it measures:
+    Square root of MSE. Brings the error back to the
+    original unit of the target.
+
+  Formula:
+    RMSE = sqrt(MSE) = sqrt( (1/N) * SUM( (y_actual - y_pred)^2 ) )
+
+  Intuition:
+    Combines the outlier sensitivity of MSE with the
+    interpretability of MAE.
+    RMSE = $25,000 means predictions are "roughly" $25,000 off
+    (but large errors contribute more).
+
+  MAE vs RMSE:
+    - RMSE >= MAE (always)
+    - If RMSE >> MAE, there are some very large errors (outliers)
+    - If RMSE ~ MAE, errors are evenly distributed
+
+  Python:
+    from sklearn.metrics import mean_squared_error
+    import numpy as np
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+
+    # Or in sklearn v1.4+
+    rmse = mean_squared_error(y_true, y_pred, squared=False)
+
+  Range: 0 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+2.4  R-SQUARED (R2 / Coefficient of Determination)
+------------------------------------------------------------------------
+
+  What it measures:
+    What PROPORTION of the variance in the target variable
+    is explained by the model?
+
+  Formula:
+    R2 = 1 - (SS_residual / SS_total)
+
+    Where:
+      SS_residual = SUM( (y_actual - y_pred)^2 )
+      SS_total    = SUM( (y_actual - y_mean)^2 )
+
+  Interpretation:
+    R2 = 1.0  -> Model explains 100% of variance (perfect)
+    R2 = 0.85 -> Model explains 85% of variance (good)
+    R2 = 0.0  -> Model is as good as predicting the mean
+    R2 < 0    -> Model is WORSE than predicting the mean
+
+  When to use:
+    - Regression tasks where you want to understand how much
+      the model has learned
+    - Comparing models on the same dataset
+    - House price prediction, sales forecasting
+
+  Limitation:
+    R2 always increases (or stays same) as you add more features,
+    even if they are irrelevant. Use Adjusted R2 instead.
+
+  Python:
+    from sklearn.metrics import r2_score
+    r2 = r2_score(y_true, y_pred)
+
+  Range: -infinity to 1 (higher is better, 1 = perfect)
+
+
+------------------------------------------------------------------------
+2.5  ADJUSTED R-SQUARED
+------------------------------------------------------------------------
+
+  What it measures:
+    R2 adjusted for the number of features. Penalizes adding
+    irrelevant features.
+
+  Formula:
+    Adj_R2 = 1 - [ (1-R2) * (n-1) / (n-p-1) ]
+
+    Where: n = number of samples, p = number of features
+
+  Intuition:
+    If adding a new feature doesn't improve the model enough,
+    Adjusted R2 will DECREASE (unlike R2 which never decreases).
+
+  When to use:
+    - Feature selection: compare models with different numbers
+      of features
+    - House price prediction with 79 features
+
+  Python:
+    def adjusted_r2(r2, n, p):
+        return 1 - (1 - r2) * (n - 1) / (n - p - 1)
+
+  Range: -infinity to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+2.6  MEAN ABSOLUTE PERCENTAGE ERROR (MAPE)
+------------------------------------------------------------------------
+
+  What it measures:
+    Average percentage error. Scale-independent.
+
+  Formula:
+    MAPE = (100/N) * SUM( |y_actual - y_pred| / |y_actual| )
+
+  Intuition:
+    "On average, the prediction is X% off from the actual value."
+    MAPE = 8% means predictions are on average 8% away from truth.
+
+  When to use:
+    - When you want a percentage-based error metric
+    - Comparing across datasets with different scales
+    - Business stakeholders understand percentages easily
+
+  Limitation:
+    - Undefined when y_actual = 0 (division by zero)
+    - Asymmetric: over-predictions and under-predictions are
+      penalized differently
+
+  Python:
+    from sklearn.metrics import mean_absolute_percentage_error
+    mape = mean_absolute_percentage_error(y_true, y_pred)
+
+  Range: 0 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+2.7  ROOT MEAN SQUARED LOG ERROR (RMSLE)
+------------------------------------------------------------------------
+
+  What it measures:
+    RMSE applied to the LOG of predictions and actual values.
+    Penalizes under-predictions MORE than over-predictions.
+
+  Formula:
+    RMSLE = sqrt( (1/N) * SUM( (log(y_pred+1) - log(y_actual+1))^2 ) )
+
+  When to use:
+    - When target has EXPONENTIAL growth (house prices, sales)
+    - When you don't want to penalize large predictions as much
+    - Common in Kaggle competitions (House Prices, Store Sales)
+    - When target values span several orders of magnitude
+
+  Python:
+    from sklearn.metrics import mean_squared_log_error
+    import numpy as np
+    rmsle = np.sqrt(mean_squared_log_error(y_true, y_pred))
+
+  Range: 0 to infinity (LOWER is better)
+
+
+================================================================================
+SECTION 3: OBJECT DETECTION METRICS
+================================================================================
+Used in: Object Detection with YOLO (DL Project 5)
+
+------------------------------------------------------------------------
+3.1  IoU (INTERSECTION OVER UNION)
+------------------------------------------------------------------------
+
+  What it measures:
+    How much the predicted bounding box overlaps with the
+    ground truth bounding box.
+
+  Formula:
+    IoU = Area of Overlap / Area of Union
+
+                ┌──────────────┐
+                │   Ground     │
+          ┌─────┤   Truth      │
+          │     │  ┌───────────┤
+          │     └──│───────────┘
+          │ Pred   │ <- Overlap area
+          └────────┘
+
+  Interpretation:
+    IoU = 1.0  -> Perfect overlap
+    IoU = 0.5  -> 50% overlap (common threshold)
+    IoU = 0.0  -> No overlap at all
+
+  Common thresholds:
+    IoU >= 0.5  -> "correct" detection (PASCAL VOC standard)
+    IoU >= 0.75 -> "strict" detection
+
+  Python:
+    def calculate_iou(box1, box2):
+        # box = [x1, y1, x2, y2]
+        x1 = max(box1[0], box2[0])
+        y1 = max(box1[1], box2[1])
+        x2 = min(box1[2], box2[2])
+        y2 = min(box1[3], box2[3])
+
+        intersection = max(0, x2-x1) * max(0, y2-y1)
+        area1 = (box1[2]-box1[0]) * (box1[3]-box1[1])
+        area2 = (box2[2]-box2[0]) * (box2[3]-box2[1])
+        union = area1 + area2 - intersection
+
+        return intersection / union if union > 0 else 0
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+3.2  mAP@0.5 (Mean Average Precision at IoU=0.5)
+------------------------------------------------------------------------
+
+  What it measures:
+    The MEAN of Average Precision (AP) across all object classes,
+    where a detection is "correct" if IoU >= 0.5.
+
+  How it's calculated (step by step):
+    1. For each class, rank all detections by confidence score
+    2. At each detection, calculate precision and recall
+    3. Plot precision-recall curve
+    4. AP = area under this curve (for that class)
+    5. mAP = average of AP across all classes
+
+  Intuition:
+    "How well does the model detect AND classify objects,
+    with a moderate overlap requirement?"
+
+  When to use:
+    - PASCAL VOC benchmark
+    - General object detection evaluation
+    - When moderate localization accuracy is acceptable
+
+  Python (using Ultralytics):
+    from ultralytics import YOLO
+    model = YOLO('yolov8n.pt')
+    results = model.val()  # automatically computes mAP
+    print(results.box.map50)  # mAP@0.5
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+3.3  mAP@0.5:0.95
+------------------------------------------------------------------------
+
+  What it measures:
+    Average mAP computed at IoU thresholds from 0.5 to 0.95
+    in steps of 0.05 (i.e., 0.5, 0.55, 0.60, ..., 0.95).
+
+  Intuition:
+    Much STRICTER than mAP@0.5. Tests both detection AND
+    precise localization. The COCO benchmark standard.
+
+  mAP@0.5 vs mAP@0.5:0.95:
+    A model might have mAP@0.5 = 0.80 but mAP@0.5:0.95 = 0.45
+    This means it detects objects well but doesn't localize
+    them precisely.
+
+  When to use:
+    - COCO benchmark (the industry standard)
+    - When precise bounding box accuracy matters
+    - Autonomous driving, medical imaging
+
+  Python (Ultralytics):
+    print(results.box.map)  # mAP@0.5:0.95
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+3.4  PRECISION-RECALL PER CLASS
+------------------------------------------------------------------------
+
+  Same as classification precision/recall (Section 1.3, 1.4)
+  but computed separately for EACH object class.
+
+  Why it matters:
+    A model might detect "car" very well (AP=0.92) but
+    "bicycle" poorly (AP=0.45). Per-class breakdown reveals
+    which objects need more training data or augmentation.
+
+  Python (Ultralytics):
+    results = model.val()
+    # results.box.ap_class_index  -> class indices
+    # results.box.ap50           -> AP@0.5 per class
+
+
+------------------------------------------------------------------------
+3.5  INFERENCE FPS (Frames Per Second)
+------------------------------------------------------------------------
+
+  What it measures:
+    How many images/frames the model can process per second.
+    Critical for REAL-TIME applications.
+
+  Benchmarks:
+    < 5 FPS      -> Too slow for real-time
+    5-15 FPS     -> Near real-time
+    15-30 FPS    -> Real-time (acceptable for many applications)
+    30+ FPS      -> True real-time (video processing)
+    60+ FPS      -> High-performance real-time
+
+  YOLO vs Faster R-CNN:
+    YOLOv8n: ~200+ FPS (fast, slightly less accurate)
+    YOLOv8x: ~40 FPS (slower, more accurate)
+    Faster R-CNN: ~5-15 FPS (accurate but slow)
+
+  Python:
+    import time
+    start = time.time()
+    for img in test_images:
+        model(img)
+    fps = len(test_images) / (time.time() - start)
+
+
+================================================================================
+SECTION 4: IMAGE SEGMENTATION METRICS
+================================================================================
+Used in: Medical Image Segmentation U-Net (DL Project 4)
+
+------------------------------------------------------------------------
+4.1  DICE COEFFICIENT (F1 for Segmentation)
+------------------------------------------------------------------------
+
+  What it measures:
+    Overlap between predicted segmentation mask and ground truth.
+    It is essentially the F1-Score applied to pixel-level predictions.
+
+  Formula:
+    Dice = 2 * |Prediction ∩ Ground Truth| /
+           (|Prediction| + |Ground Truth|)
+
+    Or equivalently:
+    Dice = 2*TP / (2*TP + FP + FN)
+
+  Intuition:
+    How similar are the predicted and actual masks?
+    Dice = 1.0 -> Perfect overlap
+    Dice = 0.0 -> No overlap
+
+  Dice vs IoU:
+    Dice is always >= IoU for the same prediction.
+    Dice = 2*IoU / (1 + IoU)
+
+  When to use:
+    - Medical image segmentation (the standard metric)
+    - Any binary/multi-class segmentation task
+
+  Also used as LOSS FUNCTION:
+    Dice Loss = 1 - Dice Coefficient
+    Often combined: Loss = BCE + Dice Loss
+
+  Python:
+    def dice_coefficient(pred, target, smooth=1e-6):
+        pred_flat = pred.flatten()
+        target_flat = target.flatten()
+        intersection = (pred_flat * target_flat).sum()
+        return (2. * intersection + smooth) / (
+            pred_flat.sum() + target_flat.sum() + smooth
+        )
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+4.2  IoU / JACCARD INDEX (for Segmentation)
+------------------------------------------------------------------------
+
+  What it measures:
+    Same concept as object detection IoU, but applied to
+    pixel-level segmentation masks.
+
+  Formula:
+    IoU = |Prediction ∩ Ground Truth| / |Prediction ∪ Ground Truth|
+    IoU = TP / (TP + FP + FN)
+
+  Relationship to Dice:
+    IoU = Dice / (2 - Dice)
+    Dice = 2 * IoU / (1 + IoU)
+
+    Example: Dice = 0.90 -> IoU = 0.818
+
+  Mean IoU (mIoU):
+    For multi-class segmentation, average IoU across all classes.
+
+  Python:
+    def iou_score(pred, target, smooth=1e-6):
+        intersection = (pred * target).sum()
+        union = pred.sum() + target.sum() - intersection
+        return (intersection + smooth) / (union + smooth)
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+4.3  PIXEL ACCURACY
+------------------------------------------------------------------------
+
+  What it measures:
+    Percentage of pixels correctly classified.
+
+  Formula:
+    Pixel Accuracy = Correctly classified pixels / Total pixels
+
+  Limitation:
+    Same problem as accuracy in classification - misleading
+    when background dominates. If 95% of pixels are background,
+    a model predicting all background gets 95% pixel accuracy.
+
+  Use mIoU or Dice instead for segmentation evaluation.
+
+  Python:
+    pixel_acc = (pred == target).sum() / target.numel()
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+4.4  HAUSDORFF DISTANCE
+------------------------------------------------------------------------
+
+  What it measures:
+    The MAXIMUM distance from any point on the predicted
+    boundary to the nearest point on the ground truth boundary.
+
+  Formula:
+    HD(A,B) = max( max_a(min_b(d(a,b))), max_b(min_a(d(a,b))) )
+
+  Intuition:
+    "What is the worst-case boundary error?"
+    Even if 99% of the boundary is perfect, one bad point
+    gives a high Hausdorff distance.
+
+  95th Percentile Hausdorff Distance (HD95):
+    More robust variant: uses 95th percentile instead of maximum.
+    Less sensitive to single outlier points.
+
+  When to use:
+    - Medical image segmentation (measures boundary accuracy)
+    - When precise boundary delineation matters (tumor boundaries)
+
+  Python:
+    from scipy.spatial.distance import directed_hausdorff
+    hd = max(
+        directed_hausdorff(pred_boundary, gt_boundary)[0],
+        directed_hausdorff(gt_boundary, pred_boundary)[0]
+    )
+
+  Range: 0 to infinity (LOWER is better)
+
+
+================================================================================
+SECTION 5: NLP & SEQUENCE METRICS
+================================================================================
+Used in: Sentiment Analysis, Transformer project, OCR System,
+         Text Summarization, Machine Translation
+
+------------------------------------------------------------------------
+5.1  BLEU SCORE (Bilingual Evaluation Understudy)
+------------------------------------------------------------------------
+
+  What it measures:
+    How similar the generated text is to reference text,
+    based on n-gram overlap.
+
+  How it works:
+    1. Count matching n-grams (1-gram, 2-gram, 3-gram, 4-gram)
+       between generated and reference text
+    2. Calculate precision for each n-gram level
+    3. Apply brevity penalty (penalizes too-short outputs)
+    4. Combine with geometric mean
+
+  Example:
+    Reference:  "The cat sat on the mat"
+    Generated:  "The cat is on the mat"
+
+    1-gram matches: The, cat, on, the, mat (5/6 = 0.83)
+    2-gram matches: "The cat", "on the", "the mat" (3/5 = 0.60)
+
+  Interpretation:
+    BLEU = 0.0  -> No overlap
+    BLEU = 0.3  -> Understandable (typical MT)
+    BLEU = 0.5  -> Good translation
+    BLEU = 1.0  -> Perfect match
+
+  When to use:
+    - Machine Translation (the standard metric)
+    - Any text generation task
+
+  Python:
+    from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
+
+    reference = [['the', 'cat', 'sat', 'on', 'the', 'mat']]
+    candidate = ['the', 'cat', 'is', 'on', 'the', 'mat']
+    score = sentence_bleu(reference, candidate)
+
+    # Or using sacrebleu (recommended)
+    # pip install sacrebleu
+    import sacrebleu
+    bleu = sacrebleu.corpus_bleu(hypotheses, [references])
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+5.2  ROUGE SCORE (Recall-Oriented Understudy for Gisting Evaluation)
+------------------------------------------------------------------------
+
+  What it measures:
+    How much of the REFERENCE text is captured in the generated
+    text. Focus on RECALL (unlike BLEU which focuses on precision).
+
+  Variants:
+    ROUGE-1: Unigram (individual word) overlap
+    ROUGE-2: Bigram (2-word phrase) overlap
+    ROUGE-L: Longest Common Subsequence (LCS)
+
+  Each variant reports:
+    - Precision: How much of the generated text is relevant
+    - Recall: How much of the reference is captured
+    - F1: Harmonic mean of precision and recall
+
+  Example:
+    Reference: "The cat sat on the mat"
+    Generated: "The cat is sitting on the mat today"
+
+    ROUGE-1 Recall = 6/6 = 1.0 (all reference words appear)
+    ROUGE-1 Precision = 6/8 = 0.75 (6 of 8 generated words match)
+
+  When to use:
+    - Text Summarization (THE standard metric)
+    - Any text generation with reference text
+
+  Python:
+    # pip install rouge-score
+    from rouge_score import rouge_scorer
+
+    scorer = rouge_scorer.RougeScorer(
+        ['rouge1', 'rouge2', 'rougeL'], use_stemmer=True
+    )
+    scores = scorer.score(reference_text, generated_text)
+    print(scores['rouge1'])  # precision, recall, fmeasure
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+5.3  BERTScore
+------------------------------------------------------------------------
+
+  What it measures:
+    Semantic similarity between generated and reference text
+    using BERT embeddings. Unlike BLEU/ROUGE which match exact
+    words, BERTScore captures MEANING.
+
+  How it works:
+    1. Encode both texts with BERT
+    2. Compute cosine similarity between each token pair
+    3. Use greedy matching to find best alignment
+    4. Report precision, recall, F1
+
+  Why it's better than BLEU/ROUGE:
+    "The dog is happy" vs "The canine is joyful"
+    BLEU/ROUGE: Low score (different words)
+    BERTScore: High score (same meaning)
+
+  When to use:
+    - Text generation quality evaluation
+    - Summarization, paraphrasing, translation
+    - When semantic equivalence matters more than exact wording
+
+  Python:
+    # pip install bert-score
+    from bert_score import score
+
+    P, R, F1 = score(
+        candidates, references, lang='en'
+    )
+    print(f"BERTScore F1: {F1.mean():.4f}")
+
+  Range: 0 to 1 (higher is better)
+
+
+------------------------------------------------------------------------
+5.4  PERPLEXITY
+------------------------------------------------------------------------
+
+  What it measures:
+    How "surprised" the language model is by the text.
+    Lower perplexity = the model predicts the text well.
+
+  Formula:
+    Perplexity = exp( -(1/N) * SUM( log P(word_i | context) ) )
+
+  Intuition:
+    Perplexity = 10 means the model is as uncertain as if it
+    had to choose uniformly among 10 words at each position.
+
+    Perplexity = 1   -> Perfect prediction
+    Perplexity = 50  -> Decent language model
+    Perplexity = 200 -> Poor model
+
+  When to use:
+    - Evaluating language models
+    - Comparing different model architectures
+    - Transformer text generation project
+
+  Python:
+    import torch
+    import math
+
+    # Given model losses (cross-entropy)
+    perplexity = math.exp(average_loss)
+
+    # Or using HuggingFace
+    from transformers import GPT2LMHeadModel, GPT2Tokenizer
+    # ... compute and exponentiate cross-entropy loss
+
+  Range: 1 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+5.5  CHARACTER ERROR RATE (CER)
+------------------------------------------------------------------------
+
+  What it measures:
+    The edit distance (Levenshtein distance) at the CHARACTER
+    level between predicted and reference text.
+
+  Formula:
+    CER = (Substitutions + Insertions + Deletions) /
+          Total characters in reference
+
+  Example:
+    Reference:  "hello world"
+    Prediction: "helo  warld"
+
+    Substitutions: 'o'->'a' (1)
+    Deletions: missing 'l' (1)
+    Insertions: extra ' ' (1)
+    CER = 3/11 = 0.273 = 27.3%
+
+  When to use:
+    - OCR evaluation (THE standard metric)
+    - Handwriting recognition
+    - Speech-to-text at character level
+
+  Python:
+    # pip install jiwer
+    from jiwer import cer
+    error_rate = cer(reference, prediction)
+
+  Range: 0 to infinity (LOWER is better, 0 = perfect)
+
+
+------------------------------------------------------------------------
+5.6  WORD ERROR RATE (WER)
+------------------------------------------------------------------------
+
+  What it measures:
+    Same as CER but at the WORD level.
+
+  Formula:
+    WER = (Substitutions + Insertions + Deletions) /
+          Total words in reference
+
+  Example:
+    Reference:  "the cat sat on the mat"
+    Prediction: "the cat sit on a mat"
+
+    Substitutions: sat->sit, the->a (2)
+    WER = 2/6 = 0.333 = 33.3%
+
+  When to use:
+    - Speech recognition (THE standard metric)
+    - OCR at word level
+    - Any speech-to-text or text recognition system
+
+  Python:
+    from jiwer import wer
+    error_rate = wer(reference, prediction)
+
+  Range: 0 to infinity (LOWER is better, 0 = perfect)
+  Note: WER CAN exceed 1.0 (100%) if there are many insertions
+
+
+================================================================================
+SECTION 6: GENERATIVE MODEL METRICS (GAN / VAE)
+================================================================================
+Used in: Face Generation with GANs (DL Project 8),
+         Image Super-Resolution (DL Project 10)
+
+------------------------------------------------------------------------
+6.1  FID (FRECHET INCEPTION DISTANCE)
+------------------------------------------------------------------------
+
+  What it measures:
+    The "distance" between the distribution of REAL images
+    and the distribution of GENERATED images, computed using
+    features from an Inception-v3 network.
+
+  How it works:
+    1. Pass real images through Inception-v3, get feature vectors
+    2. Pass generated images through Inception-v3, get feature vectors
+    3. Model both sets as multivariate Gaussians
+    4. Compute Frechet distance between the two Gaussians
+
+  Formula:
+    FID = ||mu_r - mu_g||^2 + Tr(C_r + C_g - 2*sqrt(C_r*C_g))
+
+    Where mu = mean, C = covariance of features
+
+  Interpretation:
+    FID = 0    -> Generated images = real images (perfect)
+    FID < 10   -> Excellent quality
+    FID 10-50  -> Good quality
+    FID 50-100 -> Moderate quality
+    FID > 100  -> Poor quality
+
+  When to use:
+    - GAN evaluation (THE most important GAN metric)
+    - Comparing different GAN architectures
+    - Needs at least ~10,000 generated images for reliable results
+
+  Python:
+    # pip install pytorch-fid
+    # Command line:
+    # python -m pytorch_fid path/to/real path/to/generated
+
+    # Or in code:
+    from pytorch_fid import fid_score
+    fid = fid_score.calculate_fid_given_paths(
+        [real_path, generated_path], batch_size=50, device='cuda',
+        dims=2048
+    )
+
+  Range: 0 to infinity (LOWER is better)
+
+
+------------------------------------------------------------------------
+6.2  IS (INCEPTION SCORE)
+------------------------------------------------------------------------
+
+  What it measures:
+    Quality and diversity of generated images using an
+    Inception classifier.
+
+  Two aspects:
+    1. Quality: Each image should be clearly classifiable
+       (low entropy in p(y|x))
+    2. Diversity: Overall, generated images should cover many
+       classes (high entropy in p(y))
+
+  Formula:
+    IS = exp( E_x[ KL(p(y|x) || p(y)) ] )
+
+  Interpretation:
+    Higher IS = better quality AND diversity
+    Real ImageNet images: IS ~ 11.0
+    Good GANs: IS ~ 7-9
+    Poor GANs: IS ~ 1-3
+
+  Limitation:
+    - Only measures quality via ImageNet classes
+    - Doesn't compare to real data distribution (FID does)
+    - Can be fooled by mode collapse if each mode is clear
+
+  Python:
+    # pip install torch-fidelity
+    from torch_fidelity import calculate_metrics
+    metrics = calculate_metrics(
+        input1='path/to/generated',
+        isc=True
+    )
+    print(metrics['inception_score_mean'])
+
+  Range: 1 to infinity (HIGHER is better)
+
+
+------------------------------------------------------------------------
+6.3  LPIPS (Learned Perceptual Image Patch Similarity)
+------------------------------------------------------------------------
+
+  What it measures:
+    Perceptual similarity between two images using deep network
+    features. Aligns with human visual perception.
+
+  How it works:
+    1. Extract features from both images using VGG/AlexNet
+    2. Compute weighted L2 distance in feature space
+    3. The weights are trained on human perceptual judgments
+
+  Why it's better than MSE/PSNR:
+    Two images can have the same MSE but look very different
+    to humans. LPIPS captures what HUMANS perceive as similar.
+
+  Interpretation:
+    LPIPS = 0    -> Identical images
+    LPIPS < 0.1  -> Very similar
+    LPIPS 0.1-0.3 -> Noticeably different
+    LPIPS > 0.5  -> Very different
+
+  When to use:
+    - GAN output quality evaluation
+    - Image super-resolution
+    - Any image-to-image task
+
+  Python:
+    # pip install lpips
+    import lpips
+    loss_fn = lpips.LPIPS(net='alex')
+    distance = loss_fn(img1_tensor, img2_tensor)
+
+  Range: 0 to 1+ (LOWER is better)
+
+
+================================================================================
+SECTION 7: IMAGE QUALITY METRICS (Super-Resolution)
+================================================================================
+Used in: Image Super-Resolution SRGAN/ESRGAN (DL Project 10)
+
+------------------------------------------------------------------------
+7.1  PSNR (PEAK SIGNAL-TO-NOISE RATIO)
+------------------------------------------------------------------------
+
+  What it measures:
+    Ratio between the maximum possible pixel value and the
+    reconstruction error. Measured in decibels (dB).
+
+  Formula:
+    PSNR = 10 * log10(MAX_pixel^2 / MSE)
+    PSNR = 20 * log10(MAX_pixel / sqrt(MSE))
+
+    Where MAX_pixel = 255 for 8-bit images
+
+  Interpretation:
+    PSNR = infinity  -> Identical images (MSE = 0)
+    PSNR > 40 dB     -> Excellent quality
+    PSNR 30-40 dB    -> Good quality
+    PSNR 20-30 dB    -> Acceptable quality
+    PSNR < 20 dB     -> Poor quality
+
+  Super-Resolution benchmarks:
+    4x upscaling on Set5 dataset:
+    SRCNN:  ~30.5 dB
+    SRGAN:  ~29.4 dB (lower PSNR but perceptually better!)
+    ESRGAN: ~29.8 dB
+
+  Important note:
+    Higher PSNR does NOT always mean better visual quality!
+    SRGAN has lower PSNR than SRResNet but looks sharper because
+    GAN loss produces perceptually better results. Always pair
+    PSNR with SSIM and LPIPS.
+
+  Python:
+    from skimage.metrics import peak_signal_noise_ratio
+    psnr = peak_signal_noise_ratio(original, reconstructed)
+
+    # Or manually
+    import numpy as np
+    mse = np.mean((original - reconstructed) ** 2)
+    psnr = 10 * np.log10(255**2 / mse)
+
+  Range: 0 to infinity (HIGHER is better)
+
+
+------------------------------------------------------------------------
+7.2  SSIM (STRUCTURAL SIMILARITY INDEX)
+------------------------------------------------------------------------
+
+  What it measures:
+    Structural similarity between two images considering
+    luminance, contrast, and structure - designed to match
+    human perception better than MSE/PSNR.
+
+  Three components:
+    1. Luminance (l): mean intensity comparison
+    2. Contrast (c): standard deviation comparison
+    3. Structure (s): correlation of normalized pixels
+
+  Formula:
+    SSIM(x,y) = l(x,y) * c(x,y) * s(x,y)
+
+  Interpretation:
+    SSIM = 1.0   -> Identical images
+    SSIM > 0.95  -> Excellent similarity
+    SSIM 0.8-0.95 -> Good similarity
+    SSIM < 0.8   -> Noticeable differences
+
+  Why SSIM > PSNR:
+    PSNR only measures pixel-level error.
+    SSIM captures STRUCTURAL degradation that humans notice
+    (blur, artifacts, distortions).
+
+  Python:
+    from skimage.metrics import structural_similarity
+    ssim = structural_similarity(
+        original, reconstructed, channel_axis=2  # for color
+    )
+
+  Range: -1 to 1 (HIGHER is better, typically 0 to 1)
+
+
+================================================================================
+SECTION 8: REINFORCEMENT LEARNING METRICS
+================================================================================
+Used in: Reinforcement Learning Game Agent (DL Project 12)
+
+------------------------------------------------------------------------
+8.1  AVERAGE REWARD (RETURN)
+------------------------------------------------------------------------
+
+  What it measures:
+    The total reward accumulated in an episode, averaged across
+    multiple episodes.
+
+  Formula:
+    Return (G) = SUM( gamma^t * r_t )  for t = 0 to T
+
+    Where gamma = discount factor (typically 0.99)
+
+  Intuition:
+    CartPole: Max return = 500 (balanced for 500 steps)
+    LunarLander: Max return ~ 250 (safe landing bonus)
+    Atari Breakout: Higher is better (more bricks broken)
+
+  What to track:
+    - Mean reward over last 100 episodes
+    - Max reward achieved
+    - Reward standard deviation (stability)
+
+  "Solved" thresholds:
+    CartPole-v1:   Average reward >= 475 over 100 episodes
+    LunarLander-v2: Average reward >= 200 over 100 episodes
+
+  Python:
+    rewards_history = []
+    for episode in range(num_episodes):
+        total_reward = run_episode(agent, env)
+        rewards_history.append(total_reward)
+        avg_reward = np.mean(rewards_history[-100:])
+        print(f"Episode {episode}, Avg Reward: {avg_reward:.2f}")
+
+  Range: Environment dependent (HIGHER is better)
+
+
+------------------------------------------------------------------------
+8.2  EPISODE LENGTH
+------------------------------------------------------------------------
+
+  What it measures:
+    How many timesteps the agent survives or takes to complete
+    the task.
+
+  Intuition:
+    CartPole: Longer episodes = better (balancing longer)
+    LunarLander: Shorter episodes MIGHT be better (efficient landing)
+    Maze: Shorter = better (finding path faster)
+
+  Python:
+    episode_lengths = []
+    for episode in range(num_episodes):
+        steps = run_episode(agent, env)
+        episode_lengths.append(steps)
+
+  Range: 1 to max_steps (interpretation depends on environment)
+
+
+------------------------------------------------------------------------
+8.3  REWARD CURVE & TRAINING STABILITY
+------------------------------------------------------------------------
+
+  What to plot:
+    - X-axis: Training episodes/steps
+    - Y-axis: Average reward (smoothed with moving average)
+
+  What a GOOD curve looks like:
+    - Steady upward trend
+    - Decreasing variance over time
+    - Reaches and maintains a plateau near optimal reward
+
+  What a BAD curve looks like:
+    - Oscillating wildly (unstable training)
+    - Plateauing too early (not learning)
+    - Sudden drops (catastrophic forgetting)
+
+  Python (with Weights & Biases):
+    import wandb
+    wandb.init(project="rl-cartpole")
+    wandb.log({
+        "reward": total_reward,
+        "episode_length": steps,
+        "epsilon": agent.epsilon
+    })
+
+  No numerical range - visual inspection is key.
+
+
+------------------------------------------------------------------------
+8.4  SUCCESS RATE
+------------------------------------------------------------------------
+
+  What it measures:
+    Percentage of episodes where the agent achieves the goal.
+
+  Examples:
+    LunarLander: % of episodes with successful landing
+    Maze: % of episodes where agent reaches the goal
+    Robotics: % of tasks completed successfully
+
+  Python:
+    successes = sum(1 for r in rewards if r > success_threshold)
+    success_rate = successes / total_episodes
+
+  Range: 0 to 1 (higher is better)
+
+
+================================================================================
+SECTION 9: WHICH METRIC FOR WHICH PROJECT? (Quick Reference)
+================================================================================
+
+  ┌────────────────────────────────┬────────────────────────────────────┐
+  │ Project                        │ PRIMARY Metrics                    │
+  ├────────────────────────────────┼────────────────────────────────────┤
+  │                                │                                    │
+  │ --- ML PROJECTS ---            │                                    │
+  │                                │                                    │
+  │ 1. Titanic (Classification)    │ Accuracy, F1, ROC-AUC,            │
+  │                                │ Confusion Matrix                   │
+  │                                │                                    │
+  │ 2. House Prices (Regression)   │ RMSE, MAE, R2, RMSLE              │
+  │                                │                                    │
+  │ 3. Customer Churn (Imbalanced) │ F1-Score, ROC-AUC,                │
+  │                                │ Precision-Recall Curve             │
+  │                                │                                    │
+  │ 4. Fraud Detection (Extreme    │ AUPRC, F1, Recall,                │
+  │    Imbalance)                  │ MCC, NOT accuracy                  │
+  │                                │                                    │
+  │ 5. Store Sales (Time Series)   │ RMSE, MAE, MAPE, RMSLE            │
+  │                                │                                    │
+  │ 6. Sentiment (NLP Classif.)    │ F1-Score, Accuracy,               │
+  │                                │ ROC-AUC                            │
+  │                                │                                    │
+  │ 7. Chest X-Ray (Medical)       │ ROC-AUC, F1, Recall,              │
+  │                                │ Confusion Matrix                   │
+  │                                │                                    │
+  │ --- DL PROJECTS ---            │                                    │
+  │                                │                                    │
+  │ 1. Dog Breed (Multi-class)     │ Accuracy, Top-5 Accuracy,         │
+  │                                │ Confusion Matrix                   │
+  │                                │                                    │
+  │ 2. Sentiment (RNN->BERT)       │ F1-Score, Accuracy, ROC-AUC       │
+  │                                │                                    │
+  │ 3. Autoencoder (Anomaly)       │ AUPRC, F1, Reconstruction Error,  │
+  │                                │ ROC-AUC                            │
+  │                                │                                    │
+  │ 4. U-Net Segmentation          │ Dice Coefficient, IoU,            │
+  │                                │ Hausdorff Distance                 │
+  │                                │                                    │
+  │ 5. YOLO Object Detection       │ mAP@0.5, mAP@0.5:0.95, FPS      │
+  │                                │                                    │
+  │ 6. OCR System                  │ CER, WER, Sequence Accuracy       │
+  │                                │                                    │
+  │ 7. Speech Emotion              │ Weighted F1, Accuracy,            │
+  │                                │ Confusion Matrix                   │
+  │                                │                                    │
+  │ 8. GAN Face Generation         │ FID, IS, Visual Inspection        │
+  │                                │                                    │
+  │ 9. Transformer (Translation)   │ BLEU (translation),               │
+  │    Transformer (Summarization) │ ROUGE, BERTScore (summarization)  │
+  │                                │                                    │
+  │ 10. Super-Resolution           │ PSNR, SSIM, LPIPS                 │
+  │                                │                                    │
+  │ 11. GNN (Classification)       │ ROC-AUC, Accuracy                 │
+  │     GNN (Regression)           │ MAE, RMSE                          │
+  │                                │                                    │
+  │ 12. Reinforcement Learning     │ Average Reward, Episode Length,   │
+  │                                │ Success Rate, Reward Curve        │
+  │                                │                                    │
+  │ 13. Deepfake Detection         │ AUC-ROC, Log Loss, F1,           │
+  │                                │ Per-video Accuracy                 │
+  └────────────────────────────────┴────────────────────────────────────┘
+
+
+================================================================================
+GOLDEN RULES FOR CHOOSING METRICS
+================================================================================
+
+  RULE 1: NEVER use accuracy alone on imbalanced datasets.
+          Use F1, AUPRC, or MCC instead.
+
+  RULE 2: Always report MULTIPLE metrics.
+          No single metric tells the full story.
+
+  RULE 3: Choose metrics that align with BUSINESS IMPACT.
+          - Fraud: Recall matters most (don't miss frauds)
+          - Spam: Precision matters most (don't block good emails)
+          - Medical: Recall + Specificity both matter
+
+  RULE 4: For GENERATIVE models, always include human evaluation
+          alongside automated metrics (FID, IS, BLEU are imperfect).
+
+  RULE 5: Always look at the CONFUSION MATRIX first.
+          It reveals patterns that single numbers hide.
+
+  RULE 6: For imbalanced multi-class, use MACRO metrics to
+          ensure rare classes aren't ignored.
+
+  RULE 7: Pair pixel-level metrics (PSNR) with perceptual
+          metrics (SSIM, LPIPS) for image tasks.
+
+  RULE 8: Report metrics on HELD-OUT TEST SET, not training
+          or validation set. Use cross-validation for small datasets.
+
+================================================================================
+PYTHON IMPORTS CHEAT SHEET
+================================================================================
+
+  # Classification
+  from sklearn.metrics import (
+      accuracy_score, precision_score, recall_score,
+      f1_score, roc_auc_score, average_precision_score,
+      confusion_matrix, classification_report,
+      log_loss, matthews_corrcoef, cohen_kappa_score,
+      top_k_accuracy_score,
+      roc_curve, precision_recall_curve,
+      ConfusionMatrixDisplay
+  )
+
+  # Regression
+  from sklearn.metrics import (
+      mean_absolute_error, mean_squared_error,
+      r2_score, mean_absolute_percentage_error,
+      mean_squared_log_error
+  )
+
+  # NLP
+  from nltk.translate.bleu_score import sentence_bleu, corpus_bleu
+  from rouge_score import rouge_scorer        # pip install rouge-score
+  from bert_score import score as bert_score   # pip install bert-score
+  from jiwer import wer, cer                   # pip install jiwer
+
+  # Image Quality
+  from skimage.metrics import (
+      peak_signal_noise_ratio,                 # PSNR
+      structural_similarity                    # SSIM
+  )
+
+  # GAN Metrics
+  # pip install pytorch-fid torch-fidelity lpips
+  from pytorch_fid import fid_score
+  import lpips
+
+  # Object Detection (via Ultralytics)
+  from ultralytics import YOLO
+
+  # Segmentation (custom functions shown above)
+
+================================================================================

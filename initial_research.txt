@@ -1,0 +1,363 @@
+
+╭─── Claude Code v2.1.63 ──────────────────────────────────────────────────────╮
+│                                                │ Tips for getting started    │
+│           Welcome back Tech Shottify!          │ Run /init to create a CLAU… │
+│                                                │ ─────────────────────────── │
+│                     ▐▛███▜▌                    │ Recent activity             │
+│                    ▝▜█████▛▘                   │ No recent activity          │
+│                      ▘▘ ▝▝                     │                             │
+│                                                │                             │
+│             Opus 4.6 · Claude Max              │                             │
+│   F:\Codes\Awesome-Machine-Learning-Projects   │                             │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+❯ @ML_project_ideas_pt1.txt                                                 
+  Read this file, in the file, you have given me project ideas so that I    
+  can learn machine learning.                                               
+  These were the criteria:                                                  
+  1. Projects msut be based on real life issues.                            
+  2. It will follow order ( easy to difficult)                              
+  3. Public dataset.                                                        
+  4. I can implement different types of model in the same project.          
+  5. I will be able to master feature extraction after completing the       
+  projects.                                                                 
+  6. Project should be standard so that I can showcase these in my          
+  portfolio.                                                                
+  7. Projects should be only focused on dataset processing, feature         
+  engineering and popular model using and custom hybrid model designing.    
+  --------------------------                                                
+  Now, I want you to give me at least 10 deep learning project ideas. So    
+  that I can master all the topics in the deep learning.                    
+  These are the requirements for you while you select the project ideas:    
+  1. Must have public dataset and you will provide the link of that         
+  dataset.                                                                  
+  But, in the later difficult phase, you might add one project which you    
+  will require me to create the dataset.                                    
+  2. Project should follow order meaning easy to difficult.                 
+  3. It should be something which can be used in real life so that I can    
+  deploy it in the cloud.                                                   
+  4. All the project should have the scope to implement end to end          
+  pipeline, meaning from model training to deploying and observing. I might 
+   complete the pipeline only for handful of the projects, but all the      
+  project should have the scopes.                                           
+  5. All the projects should be selected in such a way that I can showcase  
+  these in my portfolio.                                                    
+  6. I can implement different types of model in the same project.          
+  7. After completing the projects, I should have a firm and in depth       
+  knowledge and expertise on these topics:                                  
+  ANN, CNN, RNN, LSTM, GRU, Transformer, Autoencoder, transfer learning,    
+  custome hybrid model designing intuition and implementation, Attention,   
+  GAN, GNN, Unsupervised learning, reinforcement learning.                  
+  etc.                                                                      
+  8. Your suggestion should cover basic tasks like OCR, cats-dogs image     
+  classifier or different dog breeds classifier, or different rose types    
+  classifier, image segmentation, image detection, movie review classifier  
+  to some advance topics relevant and popular in recent times which will    
+  add unique values in my portfolios.                                       
+  ------------------------                                                  
+  Do deep research and verify and double check before you provide your      
+  response.                                                                 
+  ⎿  Read ML_project_ideas_pt1.txt (322 lines)
+  ⎿  ⧉ Selected 9 lines from ML_project_ideas_pt1.txt in Visual Studio Code
+
+● I'll do deep research across the web, Kaggle, and GitHub to find the best deep
+   learning project ideas for your learning journey. Let me search multiple
+  sources in parallel.
+
+● Agent(Research deep learning projects)
+  ⎿  Backgrounded agent (↓ to manage · ctrl+o to expand)
+
+● Web Search("best deep learning projects portfolio beginner to advanced 2025
+            2026 ANN CNN RNN LSTM Transformer GAN")
+  ⎿  Did 1 search in 8s
+
+● Web Search("deep learning project ideas with public datasets kaggle end to end
+             pipeline deployment 2025")
+  ⎿  Did 1 search in 9s
+
+● Web Search("GAN project ideas deep learning image generation kaggle dataset
+            face generation style transfer 2025")
+  ⎿  Did 1 search in 7s
+
+● Web Search("graph neural network GNN project ideas molecular property
+            prediction social network kaggle dataset")
+  ⎿  Did 1 search in 11s
+
+● Web Search("reinforcement learning project ideas beginner game playing
+            CartPole Atari OpenAI gym 2025")
+  ⎿  Did 1 search in 8s
+
+● Web Search("object detection YOLO deep learning project COCO Pascal VOC kaggle
+             real-time detection")
+  ⎿  Did 1 search in 8s
+
+● Web Search("image segmentation U-Net deep learning kaggle dataset medical
+            satellite carvana 2025")
+  ⎿  Did 1 search in 6s
+
+● Web Search("transformer deep learning NLP project text summarization machine
+            translation kaggle dataset huggingface 2025")
+  ⎿  Did 1 search in 8s
+
+● Web Search("autoencoder variational autoencoder project anomaly detection
+            image reconstruction denoising dataset kaggle")
+  ⎿  Did 1 search in 9s
+
+● Web Search("speech emotion recognition deep learning RAVDESS TESS dataset LSTM
+             CNN project")
+  ⎿  Did 1 search in 9s
+
+● Web Search("OCR deep learning project CRNN CTC attention mechanism IAM
+            handwriting dataset kaggle 2025")
+  ⎿  Did 1 search in 8s
+
+● Web Search("image super resolution deep learning SRGAN ESRGAN DIV2K dataset
+            kaggle project")
+  ⎿  Did 1 search in 10s
+
+● Web Search("neural style transfer deep learning project artistic VGG dataset
+            implementation PyTorch")
+  ⎿  Did 1 search in 7s
+
+● Web Search("skin cancer classification deep learning HAM10000 ISIC dataset
+            kaggle transfer learning CNN")
+  ⎿  Did 1 search in 9s
+
+● Web Search("music generation deep learning LSTM transformer MIDI dataset
+            magenta project 2025")
+  ⎿  Did 1 search in 8s
+
+● Web Search("text to image generation deep learning diffusion model stable
+            diffusion project dataset 2025")
+  ⎿  Did 1 search in 8s
+
+● Web Search("video action recognition deep learning UCF101 Kinetics dataset 3D
+            CNN transformer project")
+  ⎿  Did 1 search in 8s
+
+● Web Search("self-driving car deep learning simulation project CARLA dataset
+            autonomous driving CNN reinforcement learning")
+  ⎿  Did 1 search in 8s
+
+● Web Search("recommendation system deep learning neural collaborative filtering
+             MovieLens dataset autoencoder transformer")
+  ⎿  Did 1 search in 7s
+
+● Now let me check on my background research agent and do a couple more targeted
+   searches.
+
+● Web Search("dog breed classification deep learning Stanford dogs dataset
+            kaggle CNN transfer learning project")
+  ⎿  Did 1 search in 7s
+
+● Web Search("flower species classification deep learning Oxford 102 flowers
+            dataset kaggle CNN project")
+  ⎿  Did 1 search in 7s
+
+● Now let me check on the background research agent and do final verification
+  searches.
+
+● Task Output(non-blocking) ab59e49b8ca026f75
+  ⎿  Task is still running…
+
+● Web Search("RAVDESS speech emotion recognition dataset download kaggle link")
+  ⎿  Did 1 search in 7s
+
+● Web Search("MAESTRO piano MIDI dataset download link music generation deep
+            learning")
+  ⎿  Did 1 search in 7s
+
+● Web Search("IAM handwriting dataset download kaggle OCR recognition link")
+  ⎿  Did 1 search in 6s
+
+● Web Search("CelebA face dataset kaggle download link GAN deep learning face
+            generation attributes")
+  ⎿  Did 1 search in 7s
+
+● Web Search("Cora Citeseer PubMed graph neural network node classification
+            dataset download kaggle PyTorch Geometric")
+  ⎿  Did 1 search in 7s
+
+● Web Search("OpenAI Gymnasium CartPole LunarLander Atari reinforcement learning
+             deep Q-network PPO project beginner")
+  ⎿  Did 1 search in 10s
+
+● Let me wait for the background research agent to complete, then compile
+  everything.
+
+● Task Output ab59e49b8ca026f75
+  ⎿  No task output available
+
+● Agent "Research deep learning projects" completed
+
+● I've completed extensive research across the web, Kaggle, and GitHub. Let me
+  now compile everything into a comprehensive file for you.
+
+● Write(DL_project_ideas.txt)
+  ⎿  Wrote 1060 lines to DL_project_ideas.txt
+     ======================================================================
+     ==========
+        12 DEEP LEARNING PROJECTS: BEGINNER TO EXPERT
+        A Complete Roadmap to Master Every Major Deep Learning Architecture
+     ======================================================================
+     ==========
+
+     Research Sources: Kaggle, GitHub, Academic Papers, GeeksforGeeks,
+                       Towards Data Science, Analytics Vidhya,
+     PyTorch/TensorFlow Docs,
+                       HuggingFace, Ultralytics, OpenAI, Google Magenta
+
+     ======================================================================
+     ==========
+     … +1050 lines (ctrl+o to expand)
+
+● Here's a summary of your 12+1 Deep Learning Project Roadmap that I've
+  researched and compiled into DL_project_ideas.txt:
+
+  ---
+  Projects Overview (Easy to Difficult)
+
+  ┌─────┬──────────────────────────┬────────────┬───────────────────────────┐
+  │  #  │         Project          │ Difficulty │     Key Architectures     │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 1   │ Dog Breed Classifier     │ ★☆☆☆☆      │ CNN, Transfer Learning    │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 2   │ Sentiment Analysis (RNN  │ ★★☆☆☆      │ ANN, RNN, LSTM, GRU,      │
+  │     │ to Transformer)          │            │ Attention, BERT           │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 3   │ Autoencoder Anomaly      │ ★★★☆☆      │ Autoencoder, VAE,         │
+  │     │ Detection & Denoising    │            │ Unsupervised Learning     │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 4   │ Medical Image            │ ★★★☆☆      │ U-Net, Attention U-Net,   │
+  │     │ Segmentation (U-Net)     │            │ Encoder-Decoder           │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 5   │ Object Detection (YOLO)  │ ★★★★☆      │ YOLO, FPN, Faster R-CNN,  │
+  │     │                          │            │ SSD                       │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 6   │ OCR System (CRNN +       │ ★★★★☆      │ CNN+RNN hybrid, CTC Loss, │
+  │     │ Attention)               │            │  TrOCR                    │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 7   │ Speech Emotion           │ ★★★★☆      │ CNN, LSTM, GRU,           │
+  │     │ Recognition              │            │ CNN-BiLSTM+Attention      │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 8   │ Face Generation with     │ ★★★★☆      │ DCGAN, Conditional GAN,   │
+  │     │ GANs                     │            │ CycleGAN                  │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 9   │ Transformer from Scratch │ ★★★★★      │ Full Transformer, T5,     │
+  │     │  + Summarization         │            │ BART                      │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 10  │ Image Super-Resolution   │ ★★★★★      │ SRGAN, ESRGAN, Perceptual │
+  │     │ (SRGAN/ESRGAN)           │            │  Loss                     │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 11  │ Graph Neural Network     │ ★★★★★      │ GCN, GAT, MPNN            │
+  │     │ (Paper/Molecular)        │            │                           │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │ 12  │ Reinforcement Learning   │ ★★★★★      │ DQN, Policy Gradient, PPO │
+  │     │ Game Agent               │            │                           │
+  ├─────┼──────────────────────────┼────────────┼───────────────────────────┤
+  │     │ Deepfake Detection       │            │ CNN, LSTM, ViT,           │
+  │ 13  │ (Capstone + Custom       │ ★★★★★+     │ Multi-modal Fusion        │
+  │     │ Dataset)                 │            │                           │
+  └─────┴──────────────────────────┴────────────┴───────────────────────────┘
+
+  ---
+  What You'll Master After Completing All Projects
+
+  Every architecture you requested is covered: ANN, CNN, RNN, LSTM, GRU, 
+  Transformer, Autoencoder, Transfer Learning, Attention, GAN, GNN, Unsupervised
+   Learning, Reinforcement Learning, and Custom Hybrid Models.
+
+  All datasets are public with direct links provided. Each project has
+  end-to-end pipeline scope and deployment potential. Project 13 (Deepfake
+  Detection) includes creating your own dataset as you requested for the later
+  difficult phase.
+
+  The file is saved at DL_project_ideas.txt in your project directory with
+  complete details including dataset links, preprocessing steps, model phases,
+  evaluation metrics, and deployment strategies for each project.
+
+✻ Crunched for 8m 32s
+
+❯ What are the evaluation matrices?                                         
+  Give me a detailed guideline.                                             
+  ⎿  ⧉ Selected 9 lines from ML_project_ideas_pt1.txt in Visual Studio Code
+
+● I'll create a comprehensive evaluation metrics guideline covering all metrics
+  across your ML and DL projects.
+
+● Read 2 files (ctrl+o to expand)
+
+● Write(Evaluation_Metrics_Guide.txt)
+  ⎿  Wrote 1743 lines to Evaluation_Metrics_Guide.txt
+     ======================================================================
+     ==========
+        COMPLETE EVALUATION METRICS GUIDE
+        For Machine Learning & Deep Learning Projects
+     ======================================================================
+     ==========
+
+     This guide covers EVERY evaluation metric you will encounter across
+     all 7 ML projects and 13 DL projects in your roadmap. Organized by
+     task type with formulas, intuition, when to use, and Python code.
+
+     ======================================================================
+     ==========
+     … +1733 lines (ctrl+o to expand)
+
+● Done. I've created a comprehensive Evaluation Metrics Guide at
+  Evaluation_Metrics_Guide.txt. Here's what it covers:
+
+  ---
+  8 Sections, 30+ Metrics
+
+  Section: 1. Classification
+  Metrics Covered: Accuracy, Confusion Matrix, Precision, Recall, F1, ROC-AUC,
+    AUPRC, Log Loss, Top-K, Cohen's Kappa, MCC, Specificity
+  Used In: Titanic, Churn, Fraud, Dog Breed, Sentiment, Deepfake
+  ────────────────────────────────────────
+  Section: 2. Regression
+  Metrics Covered: MAE, MSE, RMSE, R2, Adjusted R2, MAPE, RMSLE
+  Used In: House Prices, Store Sales
+  ────────────────────────────────────────
+  Section: 3. Object Detection
+  Metrics Covered: IoU, mAP@0.5, mAP@0.5:0.95, Per-class PR, FPS
+  Used In: YOLO project
+  ────────────────────────────────────────
+  Section: 4. Segmentation
+  Metrics Covered: Dice Coefficient, IoU/Jaccard, Pixel Accuracy, Hausdorff
+    Distance
+  Used In: U-Net project
+  ────────────────────────────────────────
+  Section: 5. NLP/Sequence
+  Metrics Covered: BLEU, ROUGE, BERTScore, Perplexity, CER, WER
+  Used In: Transformer, OCR, Summarization
+  ────────────────────────────────────────
+  Section: 6. Generative (GAN)
+  Metrics Covered: FID, Inception Score, LPIPS
+  Used In: GAN Face Generation
+  ────────────────────────────────────────
+  Section: 7. Image Quality
+  Metrics Covered: PSNR, SSIM
+  Used In: Super-Resolution
+  ────────────────────────────────────────
+  Section: 8. Reinforcement Learning
+  Metrics Covered: Average Reward, Episode Length, Reward Curve, Success Rate
+  Used In: RL Game Agent
+
+  For Each Metric You Get:
+
+  - Formula with mathematical notation
+  - Plain English intuition with real examples
+  - When to use and when NOT to use
+  - Interpretation guide (what's good, what's bad)
+  - Python code with exact imports
+  - Value range and direction (higher/lower = better)
+
+  Plus:
+
+  - Section 9: Quick-reference table mapping every project to its primary
+  metrics
+  - 8 Golden Rules for choosing the right metric
+  - Python imports cheat sheet - copy-paste ready
+
+✻ Sautéed for 4m 37s
