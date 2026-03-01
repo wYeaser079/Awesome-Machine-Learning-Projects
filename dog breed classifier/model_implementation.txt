@@ -1,0 +1,842 @@
+
+╭─── Claude Code v2.1.63 ──────────────────────────────────────────────────────╮
+│                                                │ Tips for getting started    │
+│           Welcome back Tech Shottify!          │ Run /init to create a CLAU… │
+│                                                │ ─────────────────────────── │
+│                     ▐▛███▜▌                    │ Recent activity             │
+│                    ▝▜█████▛▘                   │ No recent activity          │
+│                      ▘▘ ▝▝                     │                             │
+│                                                │                             │
+│             Opus 4.6 · Claude Max              │                             │
+│   F:\Codes\Awesome-Machine-Learning-Projects   │                             │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+╭──────────────────────────────────────────────────────────────────────────────╮
+│ Plan to implement                                                            │
+│                                                                              │
+│ Dog Breed Classifier - Implementation Plan                                   │
+│                                                                              │
+│ Context                                                                      │
+│                                                                              │
+│ First project in the DL roadmap. Two self-contained Jupyter notebooks (CNN   │
+│ from scratch + Transfer Learning) that run on Kaggle/Colab. Heavily          │
+│ documented, textbook-style, following the user's specific numbered workflow  │
+│ pattern.                                                                     │
+│                                                                              │
+│ Files to Create                                                              │
+│                                                                              │
+│ dog breed classifier/                                                        │
+│ ├── 01_Dog_Breed_CNN_From_Scratch.ipynb                                      │
+│ └── 02_Dog_Breed_Transfer_Learning.ipynb                                     │
+│                                                                              │
+│ Both notebooks are 100% self-contained — no shared utils, each runs          │
+│ independently.                                                               │
+│                                                                              │
+│ ---                                                                          │
+│ Key Design Decisions                                                         │
+│                                                                              │
+│ 1. Primary Dataset: Oxford-IIIT Pet (37 categories, ~7,400 images) via       │
+│ torchvision.datasets.OxfordIIITPet                                           │
+│ 2. Extension Dataset: Stanford Dogs (120 breeds, 20,580 images) via Kaggle — │
+│  added as a bonus section at the end of each notebook                        │
+│ 3. Train/Val/Test Split: Load trainval split → random_split into 80/20       │
+│ (train/val), use test split as-is. This gives ~70/15/15 ratio.               │
+│ 4. Different transforms for train vs val: Use a wrapper class                │
+│ TransformSubset since random_split returns Subset objects that don't support │
+│  per-subset transforms                                                       │
+│ 5. Weighted sampling for class imbalance via WeightedRandomSampler           │
+│ 6. Modern torchvision weights API: ResNet50_Weights.DEFAULT, etc.            │
+│                                                                              │
+│ ---                                                                          │
+│ NOTEBOOK 1: 01_Dog_Breed_CNN_From_Scratch.ipynb                              │
+│                                                                              │
+│ Cell-by-Cell Structure:                                                      │
+│                                                                              │
+│ Section 0: Header                                                            │
+│                                                                              │
+│ - [MD] Title banner, Colab badge, Kaggle badge, project description, Table   │
+│ of Contents                                                                  │
+│ - [CODE] pip install torchinfo (silent install for Colab/Kaggle)             │
+│                                                                              │
+│ Section 1: Imports                                                           │
+│                                                                              │
+│ - [MD] Theory: Why each library is needed (PyTorch ecosystem explanation)    │
+│ - [CODE] All imports following user's exact pattern:                         │
+│   - torch, torch.nn, torch.nn.functional, torch.optim                        │
+│   - torchvision, torchvision.transforms                                      │
+│   - from torchinfo import summary                                            │
+│   - from torch.utils.data import Dataset, DataLoader, random_split,          │
+│ WeightedRandomSampler, Subset                                                │
+│   - from tqdm.notebook import tqdm                                           │
+│   - time, numpy, pandas, matplotlib.pyplot, seaborn                          │
+│   - from collections import Counter                                          │
+│   - from sklearn.metrics import classification_report, confusion_matrix,     │
+│ top_k_accuracy_score                                                         │
+│                                                                              │
+│ Section 2: Constants & Device                                                │
+│                                                                              │
+│ - [MD] Theory: Why hyperparameters matter, GPU vs CPU, reproducibility with  │
+│ seeds                                                                        │
+│ - [CODE] Define all constants in UPPER_CASE:                                 │
+│   - EPOCHS = 25, LEARNING_RATE = 1e-3, BATCH_SIZE = 32                       │
+│   - IMG_SIZE = 128 (smaller for custom CNN to manage param count)            │
+│   - NUM_CLASSES = 37, SEED = 42                                              │
+│   - Device selection, seed setting for reproducibility                       │
+│                                                                              │
+│ Section 3: Data Transforms                                                   │
+│                                                                              │
+│ - [MD] Theory: Why normalize? What does augmentation do? Formulas for        │
+│ normalization. Visual explanation of each augmentation technique.            │
+│ - [CODE] Two transform pipelines:                                            │
+│   - train_transforms: Resize, RandomHorizontalFlip, RandomRotation(20),      │
+│ ColorJitter, RandomCrop, ToTensor, Normalize                                 │
+│   - val_test_transforms: Resize, CenterCrop, ToTensor, Normalize             │
+│                                                                              │
+│ Section 4: Dataset & DataLoader                                              │
+│                                                                              │
+│ - [MD] Theory: Dataset vs DataLoader, batching, shuffling, how Oxford-IIIT   │
+│ Pet is structured, the split strategy, class balancing with                  │
+│ WeightedRandomSampler                                                        │
+│ - [CODE]                                                                     │
+│   - Load Oxford-IIIT Pet dataset                                             │
+│   - TransformSubset wrapper class for applying different transforms to       │
+│ subsets                                                                      │
+│   - random_split for train/val from trainval                                 │
+│   - Compute class weights → WeightedRandomSampler for training               │
+│   - Create 3 DataLoaders (train with sampler, val, test)                     │
+│   - Print dataset statistics                                                 │
+│                                                                              │
+│ Section 5: Visualize Data                                                    │
+│                                                                              │
+│ - [MD] Theory: Why visualization matters, understanding your data before     │
+│ modeling                                                                     │
+│ - [CODE]                                                                     │
+│   - Display a grid of 16 sample images with breed labels                     │
+│   - Class distribution bar chart                                             │
+│   - Show augmented versions of a single image side-by-side                   │
+│                                                                              │
+│ Section 6: Model Architecture                                                │
+│                                                                              │
+│ - [MD] Theory: CNN fundamentals — convolution operation (with formula),      │
+│ feature maps, pooling, BatchNorm, dropout, fully connected layers. Include   │
+│ ASCII diagram of the architecture.                                           │
+│ - [CODE] DogBreedCNN class:                                                  │
+│   - 5 conv blocks: Conv2d → BatchNorm2d → ReLU → MaxPool2d                   │
+│   - Block 1: 3→32, Block 2: 32→64, Block 3: 64→128, Block 4: 128→256, Block  │
+│ 5: 256→512                                                                   │
+│   - Adaptive Average Pooling                                                 │
+│   - Classifier: Linear → ReLU → Dropout(0.5) → Linear → ReLU → Dropout(0.3)  │
+│ → Linear(NUM_CLASSES)                                                        │
+│                                                                              │
+│ Section 7: Display Model                                                     │
+│                                                                              │
+│ - [MD] Brief explanation of model summary                                    │
+│ - [CODE] torchinfo.summary(model, input_size=(BATCH_SIZE, 3, IMG_SIZE,       │
+│ IMG_SIZE))                                                                   │
+│                                                                              │
+│ Section 8: Loss, Optimizer, Scheduler                                        │
+│                                                                              │
+│ - [MD] Theory: CrossEntropyLoss formula and why it works for multi-class,    │
+│ Adam optimizer (momentum + adaptive LR), LR scheduling (ReduceLROnPlateau)   │
+│ - [CODE]                                                                     │
+│   - criterion = nn.CrossEntropyLoss()                                        │
+│   - optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE,             │
+│ weight_decay=1e-4)                                                           │
+│   - scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, patience=3,  │
+│ factor=0.5)                                                                  │
+│                                                                              │
+│ Section 9: Train Loop Function                                               │
+│                                                                              │
+│ - [MD] Theory: Forward pass → Loss → Backward pass → Update cycle, gradient  │
+│ computation, what model.train() does                                         │
+│ - [CODE] train_one_epoch(model, loader, criterion, optimizer, device)        │
+│ function:                                                                    │
+│   - Returns average loss and accuracy                                        │
+│   - Uses tqdm progress bar                                                   │
+│   - Tracks running loss and correct predictions                              │
+│                                                                              │
+│ Section 10: Training                                                         │
+│                                                                              │
+│ - [MD] Theory: Epoch-level training, early stopping concept, learning rate   │
+│ decay                                                                        │
+│ - [CODE] Main training loop:                                                 │
+│   - Loop over EPOCHS                                                         │
+│   - Call train function                                                      │
+│   - Call validate function                                                   │
+│   - LR scheduler step                                                        │
+│   - Track history (train_loss, val_loss, train_acc, val_acc)                 │
+│   - Print epoch summary with timing                                          │
+│   - Early stopping with patience=5                                           │
+│                                                                              │
+│ Section 11: Validation Loop Function                                         │
+│                                                                              │
+│ - [MD] Theory: Why validation? Overfitting detection, torch.no_grad(),       │
+│ model.eval() vs model.train()                                                │
+│ - [CODE] validate(model, loader, criterion, device) function:                │
+│   - Returns average loss and accuracy                                        │
+│   - Uses torch.no_grad()                                                     │
+│                                                                              │
+│ Section 12: Test Loop & Evaluation                                           │
+│                                                                              │
+│ - [MD] Theory: Final evaluation on unseen data, metrics explained (accuracy, │
+│  top-5 accuracy, confusion matrix, classification report)                    │
+│ - [CODE]                                                                     │
+│   - Test function collecting all predictions and labels                      │
+│   - Accuracy calculation                                                     │
+│   - Top-5 accuracy                                                           │
+│   - Classification report (precision, recall, F1 per class)                  │
+│   - Confusion matrix heatmap (seaborn)                                       │
+│   - Training curves plot (loss + accuracy over epochs)                       │
+│                                                                              │
+│ Section 13: Save Model                                                       │
+│                                                                              │
+│ - [MD] Brief: Saving model state dict for future use                         │
+│ - [CODE] torch.save(model.state_dict(), 'dog_breed_cnn.pth')                 │
+│                                                                              │
+│ Section 14: Stanford Dogs Extension (Bonus)                                  │
+│                                                                              │
+│ - [MD] How to adapt the same pipeline for Stanford Dogs (120 breeds, Kaggle  │
+│ download)                                                                    │
+│ - [CODE] Kaggle dataset download setup, adjusted NUM_CLASSES=120, same       │
+│ pipeline re-run                                                              │
+│                                                                              │
+│ ---                                                                          │
+│ NOTEBOOK 2: 02_Dog_Breed_Transfer_Learning.ipynb                             │
+│                                                                              │
+│ Cell-by-Cell Structure:                                                      │
+│                                                                              │
+│ Sections 0-5 are nearly identical to Notebook 1, with these differences:     │
+│ - IMG_SIZE = 224 (standard for pretrained models)                            │
+│ - EPOCHS = 15 (fewer needed for transfer learning)                           │
+│ - LEARNING_RATE = 1e-4 (smaller for fine-tuning)                             │
+│ - Normalization uses ImageNet mean/std: [0.485, 0.456, 0.406], [0.229,       │
+│ 0.224, 0.225]                                                                │
+│                                                                              │
+│ Section 6: Model Architecture (FOUR MODELS)                                  │
+│                                                                              │
+│ - [MD] Deep theory on Transfer Learning:                                     │
+│   - What is transfer learning? Why does it work?                             │
+│   - Feature extraction vs fine-tuning                                        │
+│   - When to freeze/unfreeze layers                                           │
+│   - Each model's architecture overview (ResNet skip connections, VGG         │
+│ simplicity, EfficientNet compound scaling, MobileNet depthwise separable     │
+│ convs)                                                                       │
+│ - [CODE] build_model(model_name, num_classes, freeze=True) function:         │
+│   - Loads pretrained weights                                                 │
+│   - Freezes backbone (optionally)                                            │
+│   - Replaces final classifier head for 37 classes                            │
+│   - Returns model                                                            │
+│   - Supports: "resnet50", "vgg16", "efficientnet_b0", "mobilenet_v2"         │
+│                                                                              │
+│ Section 7: Display Model                                                     │
+│                                                                              │
+│ - [CODE] Summary of one model (ResNet50) as example                          │
+│                                                                              │
+│ Section 8: Training Infrastructure                                           │
+│                                                                              │
+│ - [MD] Theory: Different LR for frozen vs unfrozen layers, fine-tuning       │
+│ strategy                                                                     │
+│ - [CODE] Loss, optimizer factory, scheduler — parameterized per model        │
+│                                                                              │
+│ Sections 9-11: Train/Validate/Test Functions                                 │
+│                                                                              │
+│ - Same structure as Notebook 1, but designed to be called in a loop over all │
+│  4 models                                                                    │
+│                                                                              │
+│ Section 12: Train & Compare All Models                                       │
+│                                                                              │
+│ - [MD] Theory: Model comparison methodology                                  │
+│ - [CODE] Loop through all 4 models:                                          │
+│   - Phase 1: Feature extraction (frozen backbone, 5 epochs)                  │
+│   - Phase 2: Fine-tuning (unfreeze last few layers, 10 epochs, lower LR)     │
+│   - Store results in a comparison dict                                       │
+│                                                                              │
+│ Section 13: Comprehensive Evaluation                                         │
+│                                                                              │
+│ - [CODE]                                                                     │
+│   - Side-by-side comparison table (pandas DataFrame)                         │
+│   - Training curves for all 4 models on same plot                            │
+│   - Best model's confusion matrix                                            │
+│   - Classification report for best model                                     │
+│   - Bar chart comparing test accuracy across all 4 models                    │
+│                                                                              │
+│ Section 14: Save Best Model                                                  │
+│                                                                              │
+│ - [CODE] Save the best performing model                                      │
+│                                                                              │
+│ Section 15: Stanford Dogs Extension (Bonus)                                  │
+│                                                                              │
+│ - Same as Notebook 1's extension, adapted for transfer learning              │
+│                                                                              │
+│ ---                                                                          │
+│ Coding Style Conventions (User's Signature Style)                            │
+│                                                                              │
+│ 1. Constants in SCREAMING_SNAKE_CASE at the top                              │
+│ 2. Imports grouped logically with comments separating groups                 │
+│ 3. Section numbers match the user's workflow (1-13+)                         │
+│ 4. Functions are standalone — each loop (train/val/test) is its own function │
+│ 5. Progress bars everywhere via tqdm                                         │
+│ 6. Timing with time.time() for each epoch                                    │
+│ 7. Device-agnostic code — .to(device) everywhere                             │
+│ 8. Seed everything for reproducibility                                       │
+│ 9. Heavy markdown documentation before every code section                    │
+│ 10. Print statements for dataset stats, model summary, training progress     │
+│                                                                              │
+│ Verification                                                                 │
+│                                                                              │
+│ After creating both notebooks:                                               │
+│ 1. Review cell structure follows the exact 1-13 workflow pattern             │
+│ 2. Verify all imports match the user's specified list                        │
+│ 3. Confirm notebooks are self-contained (can be uploaded to Kaggle/Colab and │
+│  run)                                                                        │
+│ 4. Check markdown cells contain theory, formulas, and explanations           │
+│ 5. Validate that Stanford Dogs extension is clearly marked as bonus/optional │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+● I'll start by checking the project structure and then create both notebooks.
+  Let me first look at what exists.
+
+● Recalled 1 memory, read 1 file (ctrl+o to expand)
+
+● Good, the directory exists and is empty. Now let me create both notebooks.
+  Given the size, I'll create them in parallel using agents.
+
+● Now I'll create Notebook 1 — the CNN from scratch. This is a large notebook so
+   I'll build it carefully.
+
+● Write(dog breed classifier\01_Dog_Breed_CNN_From_Scratch.ipynb)
+  ⎿  Wrote 1349 lines to dog breed 
+     classifier\01_Dog_Breed_CNN_From_Scratch.ipynb
+     {
+      "cells": [
+       {
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": [
+         "# Dog Breed Classification - CNN From Scratch\n",
+         "\n",
+         "[![Open In Colab](https://colab.research.google.com/assets/colab-
+     badge.svg)](https://colab.research.google.com/github/)\n",
+         "[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](
+     https://www.kaggle.com/)\n",
+     … +1339 lines (ctrl+o to expand)
+
+● I need to fix the cell ordering issue — the validate function is called in the
+   training loop before it's defined. Let me rewrite with correct ordering.
+
+● Read 1 file (ctrl+o to expand)
+
+● Now I need to fix the cell ordering — the validate function must be defined
+  before the training loop calls it. I'll add validate to the Section 9 code
+  cell and clean up Section 11.
+  ⎿  Updated cell :
+       ---
+
+       ## 9. Training & Validation Functions
+
+       ### The Training Cycle
+
+       Each training step follows this cycle:
+
+       ```
+       1. Forward Pass:   input → model → predictions
+       2. Compute Loss:   predictions vs true labels → scalar loss
+       3. Backward Pass:  loss.backward() → compute gradients (∂L/∂w for all
+        weights)
+       4. Update Weights: optimizer.step() → w_new = w_old - lr * gradient
+       5. Zero Gradients: optimizer.zero_grad() → reset for next batch
+       ```
+
+       ### What `model.train()` vs `model.eval()` Does
+
+       | Mode | Dropout | BatchNorm | Gradients |
+       |---|---|---|---|
+       | `model.train()` | Active (randomly zeros neurons) | Uses batch
+       statistics | Computed |
+       | `model.eval()` | Disabled | Uses running statistics | Not needed
+       (use `torch.no_grad()`) |
+
+       ### Why Validate?
+
+       Validation measures how well the model generalizes to data it hasn't
+       been trained on. By comparing training and validation metrics, we can
+        detect:
+
+       | Scenario | Train Loss | Val Loss | Diagnosis |
+       |---|---|---|---|
+       | Both low, close together | ↓ | ↓ | Good fit |
+       | Train low, val high | ↓↓ | ↑ | **Overfitting** — model memorized
+       training data |
+       | Both high | ↑ | ↑ | **Underfitting** — model too simple or needs
+       more training |
+
+  ⎿  Updated cell :
+       # ============================================================
+       # 9. TRAINING & VALIDATION FUNCTIONS
+       # ============================================================
+
+       def train_one_epoch(model, loader, criterion, optimizer, device):
+           """Train the model for one epoch.
+
+           Args:
+               model: The neural network
+               loader: Training DataLoader
+               criterion: Loss function
+               optimizer: Optimizer
+               device: torch.device
+
+           Returns:
+               avg_loss (float): Average loss over all batches
+               accuracy (float): Training accuracy (0-100)
+           """
+           model.train()
+           running_loss = 0.0
+           correct = 0
+           total = 0
+
+           for images, labels in tqdm(loader, desc="Training",
+       leave=False):
+               images, labels = images.to(device), labels.to(device)
+
+               # Forward pass
+               outputs = model(images)
+               loss = criterion(outputs, labels)
+
+               # Backward pass
+               optimizer.zero_grad()
+               loss.backward()
+               optimizer.step()
+
+               # Track metrics
+               running_loss += loss.item() * images.size(0)
+               _, predicted = outputs.max(1)
+               total += labels.size(0)
+               correct += predicted.eq(labels).sum().item()
+
+           avg_loss = running_loss / total
+           accuracy = 100.0 * correct / total
+           return avg_loss, accuracy
+
+
+       @torch.no_grad()
+       def validate(model, loader, criterion, device):
+           """Evaluate the model on validation/test data.
+
+           Args:
+               model: The neural network
+               loader: Validation/Test DataLoader
+               criterion: Loss function
+               device: torch.device
+
+           Returns:
+               avg_loss (float): Average loss
+               accuracy (float): Accuracy (0-100)
+           """
+           model.eval()
+           running_loss = 0.0
+           correct = 0
+           total = 0
+
+           for images, labels in tqdm(loader, desc="Validating",
+       leave=False):
+               images, labels = images.to(device), labels.to(device)
+
+               outputs = model(images)
+               loss = criterion(outputs, labels)
+
+               running_loss += loss.item() * images.size(0)
+               _, predicted = outputs.max(1)
+               total += labels.size(0)
+               correct += predicted.eq(labels).sum().item()
+
+           avg_loss = running_loss / total
+           accuracy = 100.0 * correct / total
+           return avg_loss, accuracy
+
+● Now remove the old Section 11 (cells 25 and 26) since the validate function is
+   now in Section 9. I'll also update the Table of Contents.
+  ⎿  Updated cell :
+  ⎿  Updated cell :
+
+● Now update the Table of Contents to match the new structure.
+  ⎿  Updated cell :
+       # Dog Breed Classification - CNN From Scratch
+
+       [![Open In Colab](https://colab.research.google.com/assets/colab-bad
+       ge.svg)](https://colab.research.google.com/github/)
+       [![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](htt
+       ps://www.kaggle.com/)
+
+       ---
+
+       ## Project Overview
+
+       In this notebook, we build a **Convolutional Neural Network (CNN)
+       from scratch** using PyTorch to classify dog (and cat) breeds from
+       the **Oxford-IIIT Pet Dataset** (37 categories, ~7,400 images). The
+       goal is to deeply understand CNN mechanics — convolution, pooling,
+       batch normalization, dropout — by designing every layer ourselves,
+       without relying on pretrained weights.
+
+       **What you'll learn:**
+       - How convolutional neural networks process images
+       - Data augmentation and normalization techniques
+       - Handling class imbalance with weighted sampling
+       - Training, validation, and evaluation pipelines in PyTorch
+       - Interpreting metrics: accuracy, top-5 accuracy, confusion matrix, 
+       classification report
+
+       ---
+
+       ## Table of Contents
+
+       1. [Imports](#1-imports)
+       2. [Constants & Device Setup](#2-constants--device-setup)
+       3. [Data Transforms](#3-data-transforms)
+       4. [Dataset & DataLoader](#4-dataset--dataloader)
+       5. [Visualize Data](#5-visualize-data)
+       6. [Model Architecture](#6-model-architecture)
+       7. [Display Model Summary](#7-display-model-summary)
+       8. [Loss, Optimizer & Scheduler](#8-loss-optimizer--scheduler)
+       9. [Training & Validation 
+       Functions](#9-training--validation-functions)
+       10. [Training Loop](#10-training-loop)
+       11. [Test & Evaluation](#11-test--evaluation)
+       12. [Save Model](#12-save-model)
+       13. [Bonus: Stanford Dogs 
+       Extension](#13-bonus-stanford-dogs-extension)
+
+● Now update the remaining section headers to match the new numbering (11→Test,
+  12→Save, 13→Stanford Dogs). Let me update those markdown cells.
+  ⎿  Updated cell :
+       ---
+
+       ## 11. Test & Evaluation
+
+       ### Final Evaluation on Unseen Data
+
+       The test set is data the model has **never** seen during training or
+       validation. This gives us an unbiased estimate of real-world
+       performance.
+
+       ### Metrics We Track
+
+       | Metric | What It Measures |
+       |---|---|
+       | **Top-1 Accuracy** | % of times the model's top prediction is
+       correct |
+       | **Top-5 Accuracy** | % of times the correct class is in the model's
+        top 5 predictions |
+       | **Precision** | Of all predicted as class X, how many are actually
+       X? |
+       | **Recall** | Of all actual class X, how many did we correctly
+       predict? |
+       | **F1-Score** | Harmonic mean of precision and recall |
+       | **Confusion Matrix** | NxN grid showing predicted vs actual for
+       every class pair |
+
+
+  ⎿  Updated cell :
+       # ============================================================
+       # 11. TEST & EVALUATION
+       # ============================================================
+
+       @torch.no_grad()
+       def test_model(model, loader, device):
+           """Run inference on the test set and collect all predictions.
+
+           Returns:
+               all_labels: Ground truth labels
+               all_preds: Predicted labels
+               all_probs: Predicted probabilities (for top-k accuracy)
+           """
+           model.eval()
+           all_labels = []
+           all_preds = []
+           all_probs = []
+
+           for images, labels in tqdm(loader, desc="Testing"):
+               images, labels = images.to(device), labels.to(device)
+
+               outputs = model(images)
+               probs = F.softmax(outputs, dim=1)
+               _, predicted = outputs.max(1)
+
+               all_labels.extend(labels.cpu().numpy())
+               all_preds.extend(predicted.cpu().numpy())
+               all_probs.extend(probs.cpu().numpy())
+
+           return np.array(all_labels), np.array(all_preds),
+       np.array(all_probs)
+
+
+       # --- Run test ---
+       print("Evaluating on test set...\n")
+       test_labels, test_preds, test_probs = test_model(model, test_loader,
+       DEVICE)
+
+       # --- Accuracy ---
+       top1_acc = 100.0 * np.mean(test_labels == test_preds)
+       top5_acc = 100.0 * top_k_accuracy_score(test_labels, test_probs, k=5)
+
+       print(f"Test Top-1 Accuracy: {top1_acc:.2f}%")
+       print(f"Test Top-5 Accuracy: {top5_acc:.2f}%")
+
+
+  ⎿  Updated cell :
+       ---
+
+       ## 12. Save Model
+
+       We save the model's **state dict** (learned weights and biases) 
+       rather than the entire model object. This is more portable and 
+       doesn't depend on the exact class definition being available at load 
+       time.
+
+  ⎿  Updated cell :
+       # ============================================================
+       # 12. SAVE MODEL
+       # ============================================================
+
+       save_path = "dog_breed_cnn_from_scratch.pth"
+
+       torch.save({
+           "model_state_dict": model.state_dict(),
+           "num_classes": NUM_CLASSES,
+           "img_size": IMG_SIZE,
+           "class_names": class_names,
+           "test_accuracy": top1_acc,
+           "history": history,
+       }, save_path)
+
+       print(f"Model saved to '{save_path}'")
+       print(f"Test accuracy: {top1_acc:.2f}%")
+  ⎿  Updated cell :
+       ---
+
+       ## 13. Bonus: Stanford Dogs Extension
+
+       The **Stanford Dogs Dataset** is a more challenging benchmark with
+       **120 dog breeds** and **20,580 images**. This section shows how to
+       adapt our CNN pipeline for this larger dataset.
+
+       ### Key Differences from Oxford-IIIT Pet
+
+       | Property | Oxford-IIIT Pet | Stanford Dogs |
+       |---|---|---|
+       | Classes | 37 (dogs + cats) | 120 (dogs only) |
+       | Images | ~7,400 | ~20,580 |
+       | Difficulty | Moderate | Hard (fine-grained) |
+       | Source | torchvision built-in | Kaggle download |
+
+       > **Note:** This section requires a Kaggle API key. On Kaggle
+       notebooks, the dataset is available directly. On Colab, you'll need 
+       to upload your `kaggle.json` credentials.
+  ⎿  Updated cell :
+       # ============================================================
+       # 13. BONUS: STANFORD DOGS EXTENSION
+       # ============================================================
+
+       # Uncomment and run the cells below to train on Stanford Dogs (120 
+       breeds).
+       # This requires either:
+       #   - Running on Kaggle (dataset available at 
+       /kaggle/input/stanford-dogs-dataset)
+       #   - Kaggle API credentials for download
+
+       STANFORD_DOGS = False  # Set to True to enable
+
+       if STANFORD_DOGS:
+           import os
+           from torchvision.datasets import ImageFolder
+
+           # --- Download dataset (Colab only — skip on Kaggle) ---
+           # !pip install kaggle -q
+           # !mkdir -p ~/.kaggle && cp kaggle.json ~/.kaggle/ && chmod 600 
+       ~/.kaggle/kaggle.json
+           # !kaggle dataset download -d 
+       jessicali9530/stanford-dogs-dataset -p ./data/stanford_dogs --unzip
+
+           # --- Configuration ---
+           STANFORD_NUM_CLASSES = 120
+           STANFORD_EPOCHS = 30
+
+           # --- Paths (adjust based on your environment) ---
+           # Kaggle:
+           # TRAIN_DIR = 
+       "/kaggle/input/stanford-dogs-dataset/images/Images"
+           # Colab/Local:
+           TRAIN_DIR = "./data/stanford_dogs/images/Images"
+
+           # --- Load with ImageFolder ---
+           stanford_full = ImageFolder(root=TRAIN_DIR)
+           print(f"Stanford Dogs: {len(stanford_full)} images, 
+       {len(stanford_full.classes)} classes")
+
+           # --- Split: 80% train, 10% val, 10% test ---
+           total = len(stanford_full)
+           train_n = int(0.8 * total)
+           val_n = int(0.1 * total)
+           test_n = total - train_n - val_n
+
+           generator = torch.Generator().manual_seed(SEED)
+           sd_train, sd_val, sd_test = random_split(stanford_full,
+       [train_n, val_n, test_n], generator=generator)
+
+           # Apply transforms
+           sd_train_dataset = TransformSubset(sd_train,
+       transform=train_transforms)
+           sd_val_dataset = TransformSubset(sd_val,
+       transform=val_test_transforms)
+           sd_test_dataset = TransformSubset(sd_test,
+       transform=val_test_transforms)
+
+           # DataLoaders
+           sd_train_loader = DataLoader(sd_train_dataset,
+       batch_size=BATCH_SIZE, shuffle=True, num_workers=2, pin_memory=True)
+           sd_val_loader = DataLoader(sd_val_dataset,
+       batch_size=BATCH_SIZE, shuffle=False, num_workers=2,
+       pin_memory=True)
+           sd_test_loader = DataLoader(sd_test_dataset,
+       batch_size=BATCH_SIZE, shuffle=False, num_workers=2,
+       pin_memory=True)
+
+           print(f"Train: {len(sd_train_dataset)} | Val: 
+       {len(sd_val_dataset)} | Test: {len(sd_test_dataset)}")
+
+           # --- Build model with 120 classes ---
+           sd_model =
+       DogBreedCNN(num_classes=STANFORD_NUM_CLASSES).to(DEVICE)
+           sd_criterion = nn.CrossEntropyLoss()
+           sd_optimizer = optim.Adam(sd_model.parameters(),
+       lr=LEARNING_RATE, weight_decay=1e-4)
+           sd_scheduler =
+       optim.lr_scheduler.ReduceLROnPlateau(sd_optimizer, patience=3,
+       factor=0.5)
+
+           print(f"\nStanford Dogs model ready — {STANFORD_NUM_CLASSES} 
+       classes")
+           print("Run the same training loop (Section 10) with sd_model, 
+       sd_train_loader, etc.")
+       else:
+           print("Stanford Dogs extension is disabled. Set STANFORD_DOGS = 
+       True to enable.")
+
+● Notebook 1 is complete and properly ordered. Now let me mark task 1 as done
+  and start Notebook 2.
+
+● Now creating Notebook 2: Transfer Learning with four pretrained models.
+
+● Write(dog breed classifier\02_Dog_Breed_Transfer_Learning.ipynb)
+  ⎿  Wrote 1341 lines to dog breed 
+     classifier\02_Dog_Breed_Transfer_Learning.ipynb
+     {
+      "cells": [
+       {
+        "cell_type": "markdown",
+        "metadata": {},
+        "source": [
+         "# Dog Breed Classification - Transfer Learning\n",
+         "\n",
+         "[![Open In Colab](https://colab.research.google.com/assets/colab-
+     badge.svg)](https://colab.research.google.com/github/)\n",
+         "[![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](
+     https://www.kaggle.com/)\n",
+     … +1331 lines (ctrl+o to expand)
+
+● Now let me verify both notebooks are valid and complete.
+
+● Agent(Verify both notebooks)
+  ⎿  Done (17 tool uses · 54.9k tokens · 56m 42s)
+  (ctrl+o to expand)
+
+● Just one cosmetic issue to fix — the TOC in Notebook 2 has "Model
+  Architecture" (singular) but the header says "Model Architectures" (plural).
+  ⎿  Updated cell :
+       # Dog Breed Classification - Transfer Learning
+
+       [![Open In Colab](https://colab.research.google.com/assets/colab-badg
+       e.svg)](https://colab.research.google.com/github/)
+       [![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](http
+       s://www.kaggle.com/)
+
+       ---
+
+       ## Project Overview
+
+       In this notebook, we leverage **Transfer Learning** — using models
+       pretrained on ImageNet (1.2M images, 1000 classes) — to classify pet
+       breeds from the **Oxford-IIIT Pet Dataset** (37 categories). We
+       compare **four architectures**: ResNet-50, VGG-16, EfficientNet-B0,
+       and MobileNet-V2, using a two-phase training strategy: frozen feature
+        extraction followed by fine-tuning.
+
+       **What you'll learn:**
+       - Why transfer learning works and when to use it
+       - Feature extraction vs fine-tuning strategies
+       - How to adapt pretrained models for new tasks
+       - Comparing model architectures systematically
+       - ResNet skip connections, EfficientNet compound scaling, MobileNet 
+       depthwise separable convolutions
+
+       ---
+
+       ## Table of Contents
+
+       1. [Imports](#1-imports)
+       2. [Constants & Device Setup](#2-constants--device-setup)
+       3. [Data Transforms](#3-data-transforms)
+       4. [Dataset & DataLoader](#4-dataset--dataloader)
+       5. [Visualize Data](#5-visualize-data)
+       6. [Model Architectures](#6-model-architectures)
+       7. [Display Model Summary](#7-display-model-summary)
+       8. [Training Infrastructure](#8-training-infrastructure)
+       9. [Training & Validation 
+       Functions](#9-training--validation-functions)
+       10. [Train & Compare All Models](#10-train--compare-all-models)
+       11. [Comprehensive Evaluation](#11-comprehensive-evaluation)
+       12. [Save Best Model](#12-save-best-model)
+       13. [Bonus: Stanford Dogs 
+       Extension](#13-bonus-stanford-dogs-extension)
+
+
+● Now let me save project memory for future sessions.
+
+● Wrote 1 memory (ctrl+o to expand)
+
+● Both notebooks are complete. Here's a summary:
+
+  Created Files
+
+  dog breed classifier/
+  ├── 01_Dog_Breed_CNN_From_Scratch.ipynb   (34 cells, 13 sections)
+  └── 02_Dog_Breed_Transfer_Learning.ipynb  (35 cells, 13 sections)
+
+  Notebook 1: CNN From Scratch
+
+  - 5-block CNN (3→32→64→128→256→512 channels) with BatchNorm, ReLU, MaxPool
+  - 3-layer classifier with Dropout (0.5, 0.3)
+  - IMG_SIZE=128, EPOCHS=25, LR=1e-3
+  - Early stopping with patience=5, ReduceLROnPlateau scheduler
+  - Full evaluation: top-1/top-5 accuracy, classification report, confusion
+  matrix, training curves
+
+  Notebook 2: Transfer Learning
+
+  - 4 pretrained models: ResNet-50, VGG-16, EfficientNet-B0, MobileNet-V2
+  - Modern weights API (ResNet50_Weights.DEFAULT, etc.)
+  - Two-phase training: 5 epochs frozen (feature extraction) → 10 epochs
+  partially unfrozen (fine-tuning)
+  - Side-by-side comparison: table, training curves, accuracy bar charts
+  - Best model auto-selected with confusion matrix and classification report
+
+  Shared Features (Both Notebooks)
+
+  - Oxford-IIIT Pet dataset (37 classes) with TransformSubset wrapper for
+  per-split transforms
+  - WeightedRandomSampler for class imbalance
+  - Heavy markdown documentation with theory, formulas, ASCII diagrams, tables
+  - Stanford Dogs (120 breeds) bonus section
+  - Fully self-contained — each runs independently on Kaggle/Colab
+
+✻ Worked for 15m 29s
